@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F5D130">
+<meta name="theme-color" content="#9CCBF7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ghisa">
@@ -18,9 +18,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  --bg:#F5D130; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#4A4A45; --label:#3D3510;
-  --soft:#FCEFB4; --cream:#FFF8DA; --accent:#E2462B; --good:#2B8A50; --good-bg:#DDF1E3; --good-ink:#1A5C36;
-  --bad-bg:#FCD7CF; --hair:#E4DCC0; --shade:#B8960F;
+  --bg:#9CCBF7; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#4A4A45; --label:#16324F;
+  --soft:#D9EBFD; --cream:#EFF6FE; --accent:#E84A2A; --good:#2B8A50; --good-bg:#DDF1E3; --good-ink:#1A5C36;
+  --bad-bg:#FCD7CF; --hair:#D3E1EF; --shade:#5A8CC0;
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
@@ -182,6 +182,7 @@ nav a[aria-current="page"]{background:var(--bg);border-color:var(--ink)}
 .hero .lr{font-family:var(--f-mono);font-size:13px;color:#C9C4B4;width:40px;text-align:right;white-space:nowrap}
 /* palette */
 :root[data-pal="menta"]{--bg:#8FD9B6;--soft:#D3F2E3;--cream:#EEFAF4;--accent:#E2462B;--shade:#4E9F7C;--label:#17402E;--hair:#CFE6DA}
+:root[data-pal="giallo"]{--bg:#F5D130;--soft:#FCEFB4;--cream:#FFF8DA;--accent:#E2462B;--shade:#B8960F;--label:#3D3510;--hair:#E4DCC0}
 :root[data-pal="cielo"]{--bg:#9CCBF7;--soft:#D9EBFD;--cream:#EFF6FE;--accent:#E84A2A;--shade:#5A8CC0;--label:#16324F;--hair:#D3E1EF}
 :root[data-pal="pesca"]{--bg:#F7A8B8;--soft:#FCDCE3;--cream:#FEF0F3;--accent:#2B4FD8;--shade:#C26E80;--label:#4A1F29;--hair:#F0D4DA}
 :root[data-pal="lavanda"]{--bg:#C3B1F5;--soft:#E6DDFC;--cream:#F5F1FE;--accent:#E2462B;--shade:#8670C9;--label:#2E2257;--hair:#E0D8F5}
@@ -385,16 +386,16 @@ document.addEventListener("visibilitychange", function(){ if (!document.hidden){
 
 /* ---------- palette ---------- */
 var PALS = [
-  ["giallo","Sunny","#F5D130","#E2462B"],["menta","Mint","#8FD9B6","#E2462B"],["cielo","Sky","#9CCBF7","#E84A2A"],
+  ["cielo","Sky","#9CCBF7","#E84A2A"],["menta","Mint","#8FD9B6","#E2462B"],["giallo","Sunny","#F5D130","#E2462B"],
   ["pesca","Peach","#F7A8B8","#2B4FD8"],["lavanda","Lavender","#C3B1F5","#E2462B"],["arancio","Orange","#FF9A4D","#2B4FD8"],["carta","Paper","#EDE6D6","#E2462B"]
 ];
-var PAL = "giallo";
-try { PAL = localStorage.getItem("ghisa-pal") || "giallo"; } catch(e){}
+var PAL = "cielo";
+try { PAL = localStorage.getItem("ghisa-pal2") || "cielo"; } catch(e){}
 function applyPal(id){
   var p = PALS.filter(function(x){return x[0]===id;})[0] || PALS[0]; PAL = p[0];
-  if (PAL==="giallo") document.documentElement.removeAttribute("data-pal"); else document.documentElement.setAttribute("data-pal", PAL);
+  if (PAL==="cielo") document.documentElement.removeAttribute("data-pal"); else document.documentElement.setAttribute("data-pal", PAL);
   var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute("content", p[2]);
-  try { localStorage.setItem("ghisa-pal", PAL); } catch(e){}
+  
 }
 applyPal(PAL);
 function palHtml(){
@@ -774,7 +775,7 @@ function readDraft(){
 app.addEventListener("click", function(e){
   var b = e.target.closest("[data-act]"); if (!b) return;
   var act = b.getAttribute("data-act"), id = b.getAttribute("data-id"), d;
-  if (act==="pal"){ applyPal(b.getAttribute("data-v")); rerender(true); }
+  if (act==="pal"){ applyPal(b.getAttribute("data-v")); try { localStorage.setItem("ghisa-pal2", PAL); } catch(e){} rerender(true); }
   else if (act==="pg"){ P.g=b.getAttribute("data-v"); P.open=null; rerender(true); }
   else if (act==="pm"){ P.m=b.getAttribute("data-v"); rerender(true); }
   else if (act==="pr"){ P.r=b.getAttribute("data-v"); rerender(true); }
