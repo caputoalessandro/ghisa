@@ -19,7 +19,7 @@ Funziona interamente nel browser: niente server, niente account. I dati restano 
 ## Aggiornare l'app
 
 1. Sostituisci `index.html` nel repository con la nuova versione.
-2. In `sw.js` cambia `VERSION` (es. da `ghisa-v5` a `ghisa-v6`), così i telefoni scaricano la nuova versione.
+2. In `sw.js` cambia `VERSION` (es. da `ghisa-v6` a `ghisa-v7`), così i telefoni scaricano la nuova versione.
 
 ## Spostare i dati
 

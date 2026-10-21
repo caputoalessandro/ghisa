@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#8AB4F8">
+<meta name="theme-color" content="#5B87EE">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ghisa">
@@ -18,10 +18,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  /* unico tema: blu "cornflower" */
-  --bg:#8AB4F8; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#4A4A45; --label:#14294F;
-  --soft:#DCE7FD; --cream:#F0F5FF; --accent:#E84A2A; --good:#2B8A50; --good-bg:#DDF1E3; --good-ink:#1A5C36;
-  --bad-bg:#FCD7CF; --hair:#D2DDF2; --shade:#4C79CC;
+  /* unico tema: blu "royal" */
+  --bg:#5B87EE; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#4A4A45; --label:#0D1E48; --on-bg:#0D1E48;
+  --soft:#D6E1FB; --cream:#EFF3FD; --accent:#E84A2A; --good:#2B8A50; --good-bg:#DDF1E3; --good-ink:#1A5C36;
+  --bad-bg:#FCD7CF; --hair:#CED8EE; --shade:#2F55B5;
   --f-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
   --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
@@ -38,6 +38,8 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .label{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--label)}
 .mono{font-family:var(--f-mono)}
 .muted{color:var(--muted)}
+/* testo secondario appoggiato direttamente sullo sfondo blu: più scuro per il contrasto */
+main > .muted, main > .row > .muted, main > label{color:var(--on-bg)}
 .row{display:flex;align-items:center;gap:10px}
 .between{justify-content:space-between}
 .grow{flex:1;min-width:0}
