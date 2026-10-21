@@ -1,5 +1,5 @@
 // Ghisa: funzionamento offline. Cambia VERSION a ogni aggiornamento dell'app.
-const VERSION = "ghisa-v16";
+const VERSION = "ghisa-v17";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-180.png", "./icon-32.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

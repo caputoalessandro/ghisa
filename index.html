@@ -212,10 +212,11 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .opt{display:flex;flex-direction:column;gap:8px}
 .opt .seg button{min-height:48px;font-size:15px}
 .opt .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
-/* mascotte: piccola e discreta */
+/* mascotte: ben visibile, più grande in home */
 .bell{display:block;overflow:visible}
 .bellwrap{position:relative;display:flex;flex-direction:column;align-items:flex-end;flex:none}
-.bellwrap .bell{width:50px;height:auto}
+.bellwrap .bell{width:80px;height:auto}
+.bellwrap.home .bell{width:112px}
 /* nel tema scuro il contorno nero sparirebbe: bordo chiaro tipo adesivo */
 :root[data-theme="dark"] .bell{filter:drop-shadow(1.5px 0 0 #F2F2F2) drop-shadow(-1.5px 0 0 #F2F2F2) drop-shadow(0 1.5px 0 #F2F2F2) drop-shadow(0 -1.5px 0 #F2F2F2)}
 .bubble,.tstage .bellwrap{display:none}
