@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F4F5F0">
+<meta name="theme-color" content="#F6F2EA">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ghisa">
@@ -18,13 +18,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  /* tema "ink & lime" */
-  --bg:#F4F5F0; --surface:#FFFFFF; --raise:#E7E9E1; --line:#E0E2D9; --dash:#B5B8AC; --tint:#E9EDDD;
-  --text:#1D1F1A; --muted:#5F6358; --label:#5F6358;
-  --accent:#3D4138; --on-accent:#FFFFFF; --hero:#3D4138; --hero-hi:#C6F06B;
+  /* tema "sabbia & navy": chiaro quasi ovunque, navy pieno solo sui pulsanti */
+  --bg:#F6F2EA; --surface:#FFFDF9; --raise:#EEE7DA; --line:#E5DDCE; --dash:#B9AF9C; --tint:#E3E9F3;
+  --text:#1C2333; --muted:#5F6470; --label:#5F6470;
+  --accent:#1F3557; --on-accent:#FFFFFF; --hero:#E8EDF5; --hero-hi:#1F3557;
   --good:#2F7D4F; --good-bg:#E1F0E6; --good-ink:#1F5C38;
   --bad:#C4483B; --bad-bg:#F8E0DC; --bad-ink:#8A2A20;
-  --area:rgba(150,200,50,.22);
+  --area:rgba(31,53,87,.07);
   /* nomi usati anche dal codice dei grafici */
   --ink:var(--text); --soft:var(--raise); --cream:var(--surface);
   --sh:0 1px 2px rgba(16,24,40,.06),0 2px 6px rgba(16,24,40,.06);
@@ -193,6 +193,20 @@ nav a[aria-current="page"]{background:var(--tint);color:var(--accent)}
 .empty .bellwrap{align-items:center;margin:0 auto 6px}
 .swipe-ind{position:fixed;left:0;top:50%;transform:translate(-56px,-50%);width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;z-index:20;transition:transform .15s ease-out,background .15s;pointer-events:none}
 .swipe-ind.ready{background:var(--raise)}
+/* riepilogo chiaro (tinta navy leggerissima) */
+.hero{color:var(--text);border:1px solid #D3DCEA;box-shadow:none}
+.hero .label{color:#33496E}
+.hero .sub,.sumrow span,.hero .lr{color:var(--muted)}
+.hero .ln{color:var(--text)}
+.hero li{border-bottom-color:#D3DCEA}
+.hero .lk{color:var(--hero-hi)}
+.sumrow div{background:#FFFFFF}
+.sumrow b{color:var(--accent)}
+.btn-ink{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tinted{background:color-mix(in srgb, var(--gc) 9%, #FFFDF9)!important;border-color:color-mix(in srgb, var(--gc) 26%, #FFFDF9)!important}
+.pseg button[aria-pressed="true"]{background:var(--tint);color:var(--accent);box-shadow:inset 0 0 0 1px #C3CFE2}
+nav a[aria-current="page"]{background:var(--tint);color:var(--accent)}
+#tarc,.tring circle{stroke-width:12}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -204,8 +218,8 @@ nav a[aria-current="page"]{background:var(--tint);color:var(--accent)}
 (function(){
 "use strict";
 var KEY = "ghisa-v1";
-/* colori dei gruppi, smorzati per stare con il tema ink & lime */
-var COLORS = ["#8FAE3E","#4E9C93","#6A86C2","#C97A5A","#C9A23E","#9A7FBF","#7FA387","#C77F92"];
+/* colori dei gruppi, smorzati per stare con il tema */
+var COLORS = ["#7E9A3A","#3F8C84","#5B78B5","#B9694A","#B8922F","#8A6FB0","#6F947A","#B56F83"];
 /* il colore dipende dalla posizione del gruppo, così anche i gruppi già salvati prendono la nuova palette */
 function gColor(g){ var i = S.groups.indexOf(g); return COLORS[(i<0?0:i)%COLORS.length]; }
 var SEED2 = "SPALLE\nCavo - 4kg - 16\nLateral raise manubri — 12kg - 8 scarse\n\nBICIPITI\nHummer curl - 18kg - 5\n\nPETTO\nChest inclined - 20kg - 9\nGAMBE\nHip trust dischi - 35kg - 10";
@@ -340,7 +354,7 @@ function timerHtml(){
   return '<section class="timer'+(T.done?" done":"")+'" aria-label="Rest timer">'+
     '<div class="row between"><h2 class="title-m">Rest</h2><button class="tauto" data-act="tauto" aria-pressed="'+T.auto+'">'+(T.auto?I.checkInk:"")+'Auto-start on Save</button></div>'+
     '<div class="tstage"><div class="tring"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="84" fill="none" style="stroke:var(--soft)" stroke-width="16"/>'+
-      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#3D4138")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
+      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#1F3557")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
       '<div class="tcenter"><span id="tdisp" class="tdisp" role="timer" aria-live="off">'+(T.done?"Go!":fmtT(rem))+'</span><span id="tstate" class="label" style="color:var(--muted)">'+state+'</span></div></div>'+
       (T.done ? bellSay("go",64,"Go! Next set") : T.running ? bellSay("rest",64,"Breathe…") : T.left!=null ? bellSay("sleep",64,"Paused") : bellSay("hi",64,"Rest between sets"))+'</div>'+
     '<div class="tdur" role="group" aria-label="Duration">'+opts+'</div>'+
@@ -533,7 +547,7 @@ function vEx(id){
 
 /* ---------- progressi (sola lettura): generale → gruppo → esercizio ---------- */
 /* colori dei grafici */
-var CH = { ink:"#1C1917", hollow:"#FFFFFF", halo:"#FFFFFF", grid:"#E0E2D9" };
+var CH = { ink:"#1C2333", hollow:"#FFFDF9", halo:"#FFFDF9", grid:"#E5DDCE" };
 var P = { m:"kg", r:"all", ov:"lines" };
 var METRICS = {
   "kg": { label:"Weight", info:"The heaviest weight you lifted in each workout." },
