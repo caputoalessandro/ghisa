@@ -21,7 +21,7 @@
   /* tema "ink & lime" */
   --bg:#F4F5F0; --surface:#FFFFFF; --raise:#E7E9E1; --line:#E0E2D9; --dash:#B5B8AC; --tint:#E9EDDD;
   --text:#1D1F1A; --muted:#5F6358; --label:#5F6358;
-  --accent:#1D1F1A; --on-accent:#FFFFFF; --hero:#1D1F1A; --hero-hi:#C6F06B;
+  --accent:#3D4138; --on-accent:#FFFFFF; --hero:#3D4138; --hero-hi:#C6F06B;
   --good:#2F7D4F; --good-bg:#E1F0E6; --good-ink:#1F5C38;
   --bad:#C4483B; --bad-bg:#F8E0DC; --bad-ink:#8A2A20;
   --area:rgba(150,200,50,.22);
@@ -70,7 +70,7 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .btn{border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-weight:650;font-size:16px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-decoration:none;color:var(--text)}
 .btn:active{filter:brightness(.92)}
 .btn-accent{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
-.btn-ink{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn-ink{background:var(--hero);color:#fff;border-color:var(--hero)}
 .btn-dash{background:transparent;border:1px dashed var(--dash);font-size:14px;min-height:42px;color:var(--muted)}
 .btn-plain{background:var(--surface);font-size:14px;min-height:40px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -340,7 +340,7 @@ function timerHtml(){
   return '<section class="timer'+(T.done?" done":"")+'" aria-label="Rest timer">'+
     '<div class="row between"><h2 class="title-m">Rest</h2><button class="tauto" data-act="tauto" aria-pressed="'+T.auto+'">'+(T.auto?I.checkInk:"")+'Auto-start on Save</button></div>'+
     '<div class="tstage"><div class="tring"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="84" fill="none" style="stroke:var(--soft)" stroke-width="16"/>'+
-      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#1D1F1A")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
+      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#3D4138")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
       '<div class="tcenter"><span id="tdisp" class="tdisp" role="timer" aria-live="off">'+(T.done?"Go!":fmtT(rem))+'</span><span id="tstate" class="label" style="color:var(--muted)">'+state+'</span></div></div>'+
       (T.done ? bellSay("go",64,"Go! Next set") : T.running ? bellSay("rest",64,"Breathe…") : T.left!=null ? bellSay("sleep",64,"Paused") : bellSay("hi",64,"Rest between sets"))+'</div>'+
     '<div class="tdur" role="group" aria-label="Duration">'+opts+'</div>'+
