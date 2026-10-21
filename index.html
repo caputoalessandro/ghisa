@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F4F1EA">
+<meta name="theme-color" content="#F4F5F0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ghisa">
@@ -18,13 +18,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  /* tema "navy & sand" */
-  --bg:#F4F1EA; --surface:#FFFFFF; --raise:#EAE4D8; --line:#E4DED2; --dash:#B9B0A0;
-  --text:#1C1917; --muted:#6B6358; --label:#6B6358;
-  --accent:#1E3A8A; --on-accent:#FFFFFF; --hero:#1E3A8A; --hero-hi:#FCD58A;
+  /* tema "ink & lime" */
+  --bg:#F4F5F0; --surface:#FFFFFF; --raise:#E7E9E1; --line:#E0E2D9; --dash:#B5B8AC; --tint:#E9EDDD;
+  --text:#1D1F1A; --muted:#5F6358; --label:#5F6358;
+  --accent:#1D1F1A; --on-accent:#FFFFFF; --hero:#1D1F1A; --hero-hi:#C6F06B;
   --good:#2F7D4F; --good-bg:#E1F0E6; --good-ink:#1F5C38;
   --bad:#C4483B; --bad-bg:#F8E0DC; --bad-ink:#8A2A20;
-  --area:rgba(30,58,138,.09);
+  --area:rgba(150,200,50,.22);
   /* nomi usati anche dal codice dei grafici */
   --ink:var(--text); --soft:var(--raise); --cream:var(--surface);
   --sh:0 1px 2px rgba(16,24,40,.06),0 2px 6px rgba(16,24,40,.06);
@@ -84,7 +84,7 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .erow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 12px;min-height:56px;text-decoration:none;color:inherit;box-shadow:var(--sh)}
 .tick{width:30px;height:30px;font-family:var(--f-mono);font-weight:700;font-size:11.5px;flex:none;border:1.5px solid var(--dash);border-radius:50%;display:grid;place-items:center}
 .erow.done .tick{background:var(--good);border-color:var(--good)}
-.erow.part .tick{border-color:var(--accent);color:var(--accent);background:#E3E8F4}
+.erow.part .tick{border-color:var(--accent);color:var(--accent);background:var(--tint)}
 .ename{font-family:var(--f-display);font-weight:650;font-size:16px;line-height:1.2}
 .esub{font-size:13px;color:var(--muted)}
 .eval{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none;font-family:var(--f-mono)}
@@ -131,7 +131,7 @@ textarea::placeholder{color:#9A9183}
 
 nav{position:sticky;bottom:0;display:flex;justify-content:space-around;align-items:center;padding:6px 12px calc(8px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line);z-index:5}
 nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--muted);font-weight:650;font-size:12px;min-width:72px;padding:5px 10px;border-radius:12px}
-nav a[aria-current="page"]{background:#E3E8F4;color:var(--accent)}
+nav a[aria-current="page"]{background:var(--tint);color:var(--accent)}
 .sticky-foot{position:sticky;bottom:0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;transition:.2s;pointer-events:none;z-index:9;white-space:nowrap}
 .toast.on{opacity:1;transform:translateX(-50%)}
@@ -161,7 +161,7 @@ nav a[aria-current="page"]{background:#E3E8F4;color:var(--accent)}
 .timer{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .timer.done{border-color:var(--good);background:linear-gradient(var(--good-bg),var(--good-bg)),var(--surface)}
 .tauto{border:1px solid var(--line);border-radius:999px;background:transparent;font-weight:650;font-size:12.5px;padding:6px 12px;min-height:34px;display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
-.tauto[aria-pressed="true"]{background:#E3E8F4;color:var(--accent)}
+.tauto[aria-pressed="true"]{background:var(--tint);color:var(--accent)}
 .tring{position:relative;width:136px;height:136px;margin:0 auto}
 .tring svg{width:100%;height:100%;display:block}
 .tring circle{transition:stroke-dashoffset .25s linear}
@@ -334,7 +334,7 @@ function timerHtml(){
   return '<section class="timer'+(T.done?" done":"")+'" aria-label="Rest timer">'+
     '<div class="row between"><h2 class="title-m">Rest</h2><button class="tauto" data-act="tauto" aria-pressed="'+T.auto+'">'+(T.auto?I.checkInk:"")+'Auto-start on Save</button></div>'+
     '<div class="tstage"><div class="tring"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="84" fill="none" style="stroke:var(--soft)" stroke-width="16"/>'+
-      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#1E3A8A")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
+      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#1D1F1A")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
       '<div class="tcenter"><span id="tdisp" class="tdisp" role="timer" aria-live="off">'+(T.done?"Go!":fmtT(rem))+'</span><span id="tstate" class="label" style="color:var(--muted)">'+state+'</span></div></div>'+
       (T.done ? bellSay("go",64,"Go! Next set") : T.running ? bellSay("rest",64,"Breathe…") : T.left!=null ? bellSay("sleep",64,"Paused") : bellSay("hi",64,"Rest between sets"))+'</div>'+
     '<div class="tdur" role="group" aria-label="Duration">'+opts+'</div>'+
@@ -527,7 +527,7 @@ function vEx(id){
 
 /* ---------- progressi (sola lettura): generale → gruppo → esercizio ---------- */
 /* colori dei grafici */
-var CH = { ink:"#1C1917", hollow:"#FFFFFF", halo:"#FFFFFF", grid:"#E4DED2" };
+var CH = { ink:"#1C1917", hollow:"#FFFFFF", halo:"#FFFFFF", grid:"#E0E2D9" };
 var P = { m:"kg", r:"all", ov:"lines" };
 var METRICS = {
   "kg": { label:"Weight", info:"The heaviest weight you lifted in each workout." },
