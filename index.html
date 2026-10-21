@@ -216,6 +216,8 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .bell{display:block;overflow:visible}
 .bellwrap{position:relative;display:flex;flex-direction:column;align-items:flex-end;flex:none}
 .bellwrap .bell{width:50px;height:auto}
+/* nel tema scuro il contorno nero sparirebbe: bordo chiaro tipo adesivo */
+:root[data-theme="dark"] .bell{filter:drop-shadow(1.5px 0 0 #F2F2F2) drop-shadow(-1.5px 0 0 #F2F2F2) drop-shadow(0 1.5px 0 #F2F2F2) drop-shadow(0 -1.5px 0 #F2F2F2)}
 .bubble,.tstage .bellwrap{display:none}
 .tstage{position:relative;display:flex;justify-content:center}
 .empty .bellwrap{align-items:center;margin:0 auto 6px}
@@ -405,19 +407,24 @@ document.addEventListener("visibilitychange", function(){ if (!document.hidden){
 /* ---------- mascotte: Bell, il kettlebell ---------- */
 var bellN = 0;
 function bell(mood, size){
-  var u = "bc"+(++bellN), ink = "#1A1A1A", iron = "#6E7480";
+  /* versione "aerobica anni '80": fascia e polsini fluo, scaldamuscoli, tramonto a righe, occhiali a persiana */
+  var u = "bc"+(++bellN), ink = "#1A1A1A", iron = "#6E7480", pink = "#FF4FA3", cyan = "#2EE6E6";
   var body = "M48.4 126 A42 42 0 1 1 91.6 126 Z";
   var o = [];
   o.push('<ellipse cx="70" cy="143" rx="32" ry="4.5" fill="#000" opacity=".14"/>');
-  o.push('<path d="M58 124 v9 M82 124 v9" stroke="'+ink+'" stroke-width="7" stroke-linecap="round"/>');
-  o.push('<ellipse cx="55" cy="137" rx="8" ry="4.5" fill="'+ink+'"/><ellipse cx="85" cy="137" rx="8" ry="4.5" fill="'+ink+'"/>');
+  o.push('<rect x="52" y="120" width="12" height="15" rx="3" fill="'+pink+'" stroke="'+ink+'" stroke-width="2.5"/><rect x="76" y="120" width="12" height="15" rx="3" fill="'+pink+'" stroke="'+ink+'" stroke-width="2.5"/>');
+  o.push('<path d="M52 125 h12 M52 130 h12 M76 125 h12 M76 130 h12" stroke="'+ink+'" stroke-width="1.6"/>');
+  o.push('<ellipse cx="57" cy="138" rx="9" ry="4.5" fill="#fff" stroke="'+ink+'" stroke-width="2.5"/><ellipse cx="83" cy="138" rx="9" ry="4.5" fill="#fff" stroke="'+ink+'" stroke-width="2.5"/>');
   o.push('<path d="M47 62 C42 16, 98 16, 93 62" fill="none" stroke="'+ink+'" stroke-width="20" stroke-linecap="round"/>');
   o.push('<path d="M47 62 C42 16, 98 16, 93 62" fill="none" stroke="'+iron+'" stroke-width="10.5" stroke-linecap="round"/>');
-  o.push('<path d="'+body+'" fill="'+iron+'" stroke="'+ink+'" stroke-width="4.5" stroke-linejoin="round"/>');
-  o.push('<clipPath id="'+u+'"><path d="'+body+'"/></clipPath><g clip-path="url(#'+u+')"><rect x="20" y="59" width="100" height="13" style="fill:var(--accent)" stroke="'+ink+'" stroke-width="3"/></g>');
-  o.push('<path d="M109 63 l13 -7 l-2 11 z M109 68 l13 5 l-7 6 z" style="fill:var(--accent)" stroke="'+ink+'" stroke-width="2.5" stroke-linejoin="round"/>');
+  o.push('<defs><linearGradient id="'+u+'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD23F"/><stop offset=".5" stop-color="'+pink+'"/><stop offset="1" stop-color="#7B3FF2"/></linearGradient><clipPath id="'+u+'"><path d="'+body+'"/></clipPath></defs>');
+  o.push('<path d="'+body+'" fill="'+iron+'"/>');
+  o.push('<g clip-path="url(#'+u+')"><rect x="20" y="104" width="100" height="30" fill="url(#'+u+'g)"/><path d="M20 112 h100 M20 118 h100 M20 123 h100" stroke="'+iron+'" stroke-width="2.5"/>'+
+    '<rect x="20" y="58" width="100" height="14" fill="'+pink+'"/><path d="M20 58 h100 M20 72 h100" stroke="'+ink+'" stroke-width="3"/></g>');
+  o.push('<path d="'+body+'" fill="none" stroke="'+ink+'" stroke-width="4.5" stroke-linejoin="round"/>');
+  o.push('<path d="M109 63 l13 -7 l-2 11 z M109 68 l13 5 l-7 6 z" fill="'+pink+'" stroke="'+ink+'" stroke-width="2.5" stroke-linejoin="round"/>');
   o.push('<path d="M40 86 A31 31 0 0 1 50 74" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".35"/>');
-  function arm(d, hx, hy){ return '<path d="'+d+'" fill="none" stroke="'+ink+'" stroke-width="9" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+iron+'" stroke-width="3.5" stroke-linecap="round"/><circle cx="'+hx+'" cy="'+hy+'" r="6.5" fill="'+iron+'" stroke="'+ink+'" stroke-width="3"/>'; }
+  function arm(d, hx, hy){ return '<path d="'+d+'" fill="none" stroke="'+ink+'" stroke-width="9" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+iron+'" stroke-width="3.5" stroke-linecap="round"/><circle cx="'+hx+'" cy="'+hy+'" r="6.5" fill="'+iron+'" stroke="'+ink+'" stroke-width="3"/><rect x="'+(hx-6)+'" y="'+(hy-12)+'" width="12" height="6" rx="2" fill="'+cyan+'" stroke="'+ink+'" stroke-width="2"/>'; }
   var A = {
     down:  arm("M31 98 Q20 108 22 117",22,118)+arm("M109 98 Q120 108 118 117",118,118),
     wave:  arm("M31 98 Q20 108 22 117",22,118)+arm("M109 94 Q125 82 123 62",123,58)+'<path d="M132 50 q5 6 2 13 M137 44 q8 10 3 22" fill="none" stroke="'+ink+'" stroke-width="2.5" stroke-linecap="round"/>',
@@ -425,12 +432,8 @@ function bell(mood, size){
     cheer: arm("M31 92 Q17 78 19 56",19,52)+arm("M109 92 Q123 78 121 56",121,52),
     think: arm("M31 98 Q18 104 15 113",15,114)+'<rect x="-2" y="104" width="16" height="20" rx="2" fill="#fff" stroke="'+ink+'" stroke-width="2.5" transform="rotate(-10 6 114)"/><path d="M1 110 h9 M1 115 h9 M1 120 h6" stroke="'+ink+'" stroke-width="1.6" transform="rotate(-10 6 114)"/>'+arm("M109 100 Q114 118 97 117",95,116)
   };
-  var E = {
-    open: function(dx,dy){ return [57,83].map(function(x){ return '<ellipse cx="'+x+'" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="'+ink+'" stroke-width="3"/><circle cx="'+(x+dx)+'" cy="'+(93+dy)+'" r="4.3" fill="'+ink+'"/><circle cx="'+(x+dx+1.6)+'" cy="'+(91+dy)+'" r="1.4" fill="#fff"/>'; }).join(""); },
-    happy: '<path d="M50 95 Q57 85 64 95 M76 95 Q83 85 90 95" fill="none" stroke="'+ink+'" stroke-width="4" stroke-linecap="round"/>',
-    tired: [57,83].map(function(x){ return '<ellipse cx="'+x+'" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="'+ink+'" stroke-width="3"/><circle cx="'+x+'" cy="96" r="4" fill="'+ink+'"/><path d="M'+(x-8.5)+' 92 A8.5 9.5 0 0 1 '+(x+8.5)+' 92 Z" fill="'+iron+'" stroke="'+ink+'" stroke-width="3"/>'; }).join(""),
-    closed: '<path d="M50 93 Q57 99 64 93 M76 93 Q83 99 90 93" fill="none" stroke="'+ink+'" stroke-width="3.5" stroke-linecap="round"/>'
-  };
+  function shades(dy){ return '<g transform="translate(0 '+dy+')"><path d="M44 84 H96 V92 Q96 100 88 100 H80 Q72 100 72 92 V88 H68 V92 Q68 100 60 100 H52 Q44 100 44 92 Z" fill="'+ink+'"/>'+
+    '<path d="M47 88 H65 M47 92 H65 M47 96 H64 M75 88 H93 M75 92 H93 M76 96 H93" stroke="'+cyan+'" stroke-width="2"/></g>'; }
   var M = {
     smile: '<path d="M61 108 Q70 117 79 108" fill="none" stroke="'+ink+'" stroke-width="4" stroke-linecap="round"/>',
     grin:  '<path d="M58 106 Q70 124 82 106 Z" fill="'+ink+'" stroke="'+ink+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M63 113 Q70 120 77 113 Q70 109 63 113" fill="#E85C6A"/>',
@@ -438,16 +441,15 @@ function bell(mood, size){
     flat:  '<path d="M65 111 h10" stroke="'+ink+'" stroke-width="3.5" stroke-linecap="round"/>',
     hmm:   '<path d="M64 112 Q70 109 77 112" fill="none" stroke="'+ink+'" stroke-width="3.5" stroke-linecap="round"/>'
   };
-  var cheeks = '<circle cx="47" cy="104" r="5" fill="#F28B9B" opacity=".75"/><circle cx="93" cy="104" r="5" fill="#F28B9B" opacity=".75"/>';
   function star(x,y,r){ return '<path d="M'+x+' '+(y-r)+' Q'+x+' '+y+' '+(x+r)+' '+y+' Q'+x+' '+y+' '+x+' '+(y+r)+' Q'+x+' '+y+' '+(x-r)+' '+y+' Q'+x+' '+y+' '+x+' '+(y-r)+'Z" fill="#FFD43B" stroke="'+ink+'" stroke-width="2" stroke-linejoin="round"/>'; }
   function drop(x,y){ return '<path d="M'+x+' '+y+' c-4 6 -5.5 9 -5.5 11.5 a5.5 5.5 0 0 0 11 0 c0 -2.5 -1.5 -5.5 -5.5 -11.5z" fill="#7CC8FF" stroke="'+ink+'" stroke-width="2.2"/>'; }
   var x = "";
-  if (mood==="hi")    x = A.wave + E.open(0,1) + M.smile + cheeks;
-  if (mood==="flex")  x = A.flex + E.happy + M.grin + cheeks + '<path d="M49 80 l13 4 M91 80 l-13 4" stroke="'+ink+'" stroke-width="3.5" stroke-linecap="round"/>' + star(8,40,7) + star(132,36,6);
-  if (mood==="go")    x = A.cheer + E.happy + M.grin + cheeks + star(70,6,7) + star(6,70,5) + star(134,72,5);
-  if (mood==="rest")  x = A.down + E.tired + M.pant + drop(112,50) + drop(24,58);
-  if (mood==="sleep") x = A.down + E.closed + M.flat + '<text x="104" y="38" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="20" fill="'+ink+'">z</text><text x="118" y="22" font-family="Bricolage Grotesque,sans-serif" font-weight="800" font-size="15" fill="'+ink+'">z</text>';
-  if (mood==="think") x = A.think + E.open(-2,-3) + M.hmm + '<path d="M48 79 l14 -3" stroke="'+ink+'" stroke-width="3.5" stroke-linecap="round"/>';
+  if (mood==="hi")    x = A.wave + shades(0) + M.smile;
+  if (mood==="flex")  x = A.flex + shades(0) + M.grin + star(8,40,7) + star(132,36,6);
+  if (mood==="go")    x = A.cheer + shades(0) + M.grin + star(70,6,7) + star(6,70,5) + star(134,72,5);
+  if (mood==="rest")  x = A.down + '<path d="M48 92 h18 M74 92 h18" stroke="'+ink+'" stroke-width="4" stroke-linecap="round"/>' + M.pant + drop(112,50) + drop(24,58);
+  if (mood==="sleep") x = A.down + '<path d="M50 93 Q57 99 64 93 M76 93 Q83 99 90 93" fill="none" stroke="'+ink+'" stroke-width="3.5" stroke-linecap="round"/>' + M.flat + '<text x="104" y="38" font-family="Archivo Black,sans-serif" font-size="20" fill="'+ink+'">z</text><text x="118" y="22" font-family="Archivo Black,sans-serif" font-size="15" fill="'+ink+'">z</text>';
+  if (mood==="think") x = A.think + shades(-6) + M.hmm;
   o.push(x);
   return '<svg class="bell bell-'+mood+'" viewBox="-6 0 152 150" width="'+size+'" height="'+Math.round(size*150/152)+'" role="img" aria-label="Bell the kettlebell">'+o.join("")+'</svg>';
 }
