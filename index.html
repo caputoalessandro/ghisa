@@ -92,6 +92,9 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .eval span{font-size:12.5px;color:var(--muted)}
 .bar{flex:1;height:8px;background:var(--raise);border-radius:9px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:9px}
+/* tocchi di colore del gruppo */
+.tinted{background:#fff;background:color-mix(in srgb, var(--gc) 13%, #fff)!important;border-color:color-mix(in srgb, var(--gc) 35%, #fff)!important}
+.gtop{border-top:4px solid var(--gc)!important}
 .sets{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sdots{display:flex;gap:5px;flex:1;min-width:0;flex-wrap:wrap}
 .sdots i{width:22px;height:22px;border:1.5px solid var(--dash);border-radius:50%;display:grid;place-items:center}
@@ -201,7 +204,10 @@ nav a[aria-current="page"]{background:var(--tint);color:var(--accent)}
 (function(){
 "use strict";
 var KEY = "ghisa-v1";
-var COLORS = ["#E2462B","#3B6FE0","#2B9A5B","#9B4FD1","#F08A1C","#E0457B","#1FA3A3","#7A5A00"];
+/* colori dei gruppi, smorzati per stare con il tema ink & lime */
+var COLORS = ["#8FAE3E","#4E9C93","#6A86C2","#C97A5A","#C9A23E","#9A7FBF","#7FA387","#C77F92"];
+/* il colore dipende dalla posizione del gruppo, così anche i gruppi già salvati prendono la nuova palette */
+function gColor(g){ var i = S.groups.indexOf(g); return COLORS[(i<0?0:i)%COLORS.length]; }
 var SEED2 = "SPALLE\nCavo - 4kg - 16\nLateral raise manubri — 12kg - 8 scarse\n\nBICIPITI\nHummer curl - 18kg - 5\n\nPETTO\nChest inclined - 20kg - 9\nGAMBE\nHip trust dischi - 35kg - 10";
 var SEED = "SPALLE\nMilitarypress — 9kg - 7\nCavo - 4kg - 16\nLateral raise manubri — 12kg - 8 scarse\nMacchina - 50kg - 7\n\nBICIPITI\nBilanciere curl — 6kg - 6\nHummer curl - 18kg - 5\nPanca Scott — 11kg - 8 scarse\nIncline dumbbell curl — 10KG - 10\n\nPETTO\nPanca piana- 22,5 kg - 4\nChest press - 27,5kg - 12\nChest inclined - 20kg - 9\nPanca inclined - 17,5kg - 5\nPec dek - 45kg-12\n\nTRICIPITI\nClose grip bench press - 18kg - 8\nCable overhead triceps extension -18kg - 12\nCable triceps pushdown (basso) — 18kg - 17\n\nGAMBE\nSquat - 15kg - 10\nHip trust macchina cavo - 80kg - 10\nHip trust dischi - 35kg - 10";
 
@@ -446,7 +452,7 @@ function vHome(){
         var top = ls.reduce(function(a,l){ return l.kg>a.kg ? l : a; }, ls[0]);
         return '<li><span class="ln">'+esc(ex.name)+'</span><span class="lk">'+fmtKg(top.kg)+' kg</span><span class="lr">× '+top.reps+' reps</span></li>';
       }).join("");
-      return rows ? '<div class="lgrp"><span class="lgname"><i class="dot" style="background:'+g.color+';"></i>'+esc(g.name)+'</span><ul>'+rows+'</ul></div>' : "";
+      return rows ? '<div class="lgrp"><span class="lgname"><i class="dot" style="background:'+gColor(g)+';"></i>'+esc(g.name)+'</span><ul>'+rows+'</ul></div>' : "";
     }).join("");
     hero = '<section class="hero"><span class="label">'+(last===today()?"Today":"Last workout · "+esc(longDay(last)))+'</span>'+blocks+'</section>';
   } else {
@@ -455,7 +461,7 @@ function vHome(){
   var nEx = S.groups.reduce(function(a,g){return a+g.exercises.length;},0);
   var cards = S.groups.map(function(g){
     var d = lastDateOfGroup(g);
-    return '<a class="gcard" href="#/g/'+g.id+'"><span class="row between"><b>'+esc(g.name)+'</b><span class="dot" style="background:'+g.color+'"></span></span>'+
+    return '<a class="gcard tinted" style="--gc:'+gColor(g)+'" href="#/g/'+g.id+'"><span class="row between"><b>'+esc(g.name)+'</b><span class="dot" style="background:'+gColor(g)+'"></span></span>'+
       '<span class="muted" style="font-size:14px">'+g.exercises.length+(g.exercises.length===1?' exercise':' exercises')+'</span><span class="tag" style="align-self:flex-start">'+esc(rel(d))+'</span></a>';
   }).join("");
   var trainedToday = last===today();
@@ -482,10 +488,10 @@ function vGroup(id){
       (ref?'<span class="eval"><b>'+fmtKg(ref.kg)+' kg</b><span>× '+ref.reps+' reps</span></span>':'')+'</a>';
   }).join("");
   var pct = n? Math.round(done/n*100):0;
-  return '<main>'+topBack("#/",'<span class="dot" style="width:18px;height:18px;background:'+g.color+'"></span>')+
+  return '<main>'+topBack("#/",'<span class="dot" style="width:18px;height:18px;background:'+gColor(g)+'"></span>')+
     '<div style="display:flex;flex-direction:column;gap:6px"><div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">Today · '+esc(longDay(t))+'</span><h1 class="title-xl">'+esc(g.name)+'</h1></div>'+
     (n ? (done===n ? bellSay("flex",70,"All done!") : done ? bellSay("go",70,(n-done)+" to go!") : bellSay("hi",70,"Let's go!")) : "")+'</div>'+
-    '<div class="row" style="margin-top:6px"><div class="bar"><i style="width:'+pct+'%"></i></div><span class="mono" style="font-weight:700;font-size:13px">'+done+'/'+n+'</span></div></div>'+
+    '<div class="row" style="margin-top:6px"><div class="bar"><i style="width:'+pct+'%;background:'+gColor(g)+'"></i></div><span class="mono" style="font-weight:700;font-size:13px">'+done+'/'+n+'</span></div></div>'+
     '<div class="list">'+(rows||'<div class="empty">'+bellSay("sleep",70,"")+'No exercises yet. Add one below.</div>')+'</div>'+
     '<button class="btn btn-dash" data-act="newEx" data-id="'+g.id+'">'+I.plus+'Add exercise</button>'+
     '<div class="links"><button class="btn btn-plain" data-act="renGroup" data-id="'+g.id+'">Rename group</button><button class="btn btn-plain" data-act="delGroup" data-id="'+g.id+'">Delete group</button></div>'+
@@ -510,7 +516,7 @@ function vEx(id){
   }).join("")+'</div>' : "";
   return '<main><div class="row"><a class="iconbtn" data-back href="#/g/'+f.g.id+'" aria-label="Back">'+I.back+'</a>'+
     '<div class="grow"><span class="label">'+esc(f.g.name)+' · '+idx+' of '+f.g.exercises.length+'</span><h1 class="title-l">'+esc(f.ex.name)+'</h1></div></div>'+
-    '<section class="logcard">'+setsRow+
+    '<section class="logcard gtop" style="--gc:'+gColor(f.g)+'">'+setsRow+
       (prev?'<div class="row" style="font-size:14px;flex-wrap:wrap;gap:8px"><span class="muted">Last time:</span><span class="mono" style="font-weight:700">'+fmtKg(prev.kg)+' kg × '+prev.reps+' reps</span>'+(prev.scarse?'<span class="tag scarse">BARELY</span>':'')+'</div>':'')+
       '<div><label class="label" for="kg" style="color:var(--muted)">Weight · step 1.25 kg</label><div class="step">'+
         '<button data-act="kg" data-d="-1.25" aria-label="Remove 1.25 kg">'+I.minus+'</button><input id="kg" inputmode="decimal" value="'+fmtKg(dr.kg)+'"><span class="unit">kg</span>'+
@@ -661,14 +667,14 @@ function overallChart(lines, mode){
       '<text x="'+(X(last.date)-9).toFixed(1)+'" y="'+(Y(last.v)+(last.v>=0?-9:16)).toFixed(1)+'" text-anchor="end" class="ax" style="font-weight:700;fill:'+CH.ink+';font-size:12px;paint-order:stroke;stroke:'+CH.halo+';stroke-width:3px">'+fmtPct(last.v)+'</text>';
   } else {
     body = glines.map(function(l){
-      var c = l.g.color, last = l.pts[l.pts.length-1];
+      var c = gColor(l.g), last = l.pts[l.pts.length-1];
       return '<polyline points="'+pl(l.pts)+'" fill="none" stroke="'+c+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+
         '<circle cx="'+X(last.date).toFixed(1)+'" cy="'+Y(last.v).toFixed(1)+'" r="4" fill="'+c+'" stroke="'+CH.ink+'" stroke-width="1.5"/>';
     }).join("");
   }
   var xl = '<text x="'+L+'" y="'+(H-8)+'" class="ax">'+shortDate(all.reduce(function(a,p){return p.date<a?p.date:a;}, all[0].date))+'</text><text x="'+(W-R)+'" y="'+(H-8)+'" text-anchor="end" class="ax">'+shortDate(all.reduce(function(a,p){return p.date>a?p.date:a;}, all[0].date))+'</text>';
   var legend = mode==="avg" ? '<span><i class="lg-dot"></i>average of '+lines.length+' exercises vs their first workout</span>'
-    : glines.map(function(l){ var v = l.pts[l.pts.length-1].v; return '<span><i class="lg-line" style="background:'+l.g.color+'"></i>'+esc(l.g.name)+' '+fmtPct(v)+'</span>'; }).join("");
+    : glines.map(function(l){ var v = l.pts[l.pts.length-1].v; return '<span><i class="lg-line" style="background:'+gColor(l.g)+'"></i>'+esc(l.g.name)+' '+fmtPct(v)+'</span>'; }).join("");
   return '<svg viewBox="0 0 '+W+' '+H+'" class="big" role="img" aria-label="Overall progress">'+g+body+xl+'</svg><div class="legend">'+legend+'</div>';
 }
 
@@ -693,7 +699,7 @@ function vProg(){
     var ts = trendsOf(g), u = ts.filter(function(i){return i.t.kind==="up";}).length, dn = ts.filter(function(i){return i.t.kind==="down";}).length;
     var gl = overallLines([g]), ga = gl.length ? avgLine(gl) : [];
     var pv = ga.length>1 ? spark(ga, 120, 46) : '<span class="mono muted" style="font-size:11px;text-align:right;display:block">not enough<br>workouts yet</span>';
-    return '<a class="erow done" href="#/p/g/'+g.id+'"><span class="grow" style="display:flex;flex-direction:column;gap:4px"><span class="row" style="gap:7px"><span class="dot" style="background:'+g.color+'"></span><span class="ename">'+esc(g.name)+'</span></span>'+
+    return '<a class="erow done tinted" style="--gc:'+gColor(g)+'" href="#/p/g/'+g.id+'"><span class="grow" style="display:flex;flex-direction:column;gap:4px"><span class="row" style="gap:7px"><span class="dot" style="background:'+gColor(g)+'"></span><span class="ename">'+esc(g.name)+'</span></span>'+
       '<span class="row" style="gap:5px;flex-wrap:wrap">'+(ga.length>1?'<span class="tag '+(ga[ga.length-1].v>=2?"up":ga[ga.length-1].v<=-2?"scarse":"")+'">'+fmtPct(ga[ga.length-1].v)+'</span>':'')+
       (u?'<span class="tag up">↑ '+u+'</span>':'')+(dn?'<span class="tag scarse">↓ '+dn+'</span>':'')+'<span class="mono muted" style="font-size:12px">'+ts.length+'/'+g.exercises.length+' exercises</span></span></span>'+
       '<span style="width:120px;flex:none">'+pv+'</span></a>';
@@ -714,7 +720,7 @@ function vProgGroup(id){
     return '<a class="erow done" href="#/p/e/'+ex.id+'"><span class="grow" style="display:flex;flex-direction:column;gap:3px"><span class="ename">'+esc(ex.name)+'</span>'+
       '<span class="row" style="gap:6px;flex-wrap:wrap">'+trendTag(trendOf(s))+'<span class="mono muted" style="font-size:12px">'+esc(pLabel(last,P.m))+'</span></span></span><span class="spark-wrap">'+spark(s)+'</span></a>';
   }).join("");
-  return '<main>'+topBack("#/p",'<span class="dot" style="width:18px;height:18px;background:'+g.color+'"></span>')+
+  return '<main>'+topBack("#/p",'<span class="dot" style="width:18px;height:18px;background:'+gColor(g)+'"></span>')+
     '<div><span class="label">Progress · '+esc(METRICS[P.m].label)+'</span><h1 class="title-xl">'+esc(g.name)+'</h1></div>'+metricSeg()+rangeSeg()+
     '<div class="list">'+(rows||'<div class="empty">No exercises yet.</div>')+'</div></main>'+navBar("prog");
 }
