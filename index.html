@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0E1729">
+<meta name="theme-color" content="#F4F1EA">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ghisa">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="description" content="Ghisa – a simple gym log with rest timer and progress charts.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
@@ -18,20 +18,20 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 :root{
-  /* tema scuro "navy & sand" */
-  --bg:#0E1729; --surface:#17223B; --raise:#1F2C4A; --line:#2A3858;
-  --text:#F2EEE6; --muted:#A3ADC2; --label:#C9BFA8;
-  --accent:#E9C77B; --on-accent:#1A1408; --hero:#1B2E63; --hero-hi:#FCD58A;
-  --good:#4CC38A; --good-bg:rgba(76,195,138,.16); --good-ink:#8FE3B9;
-  --bad:#FF8A80; --bad-bg:rgba(255,138,128,.16); --bad-ink:#FFB3AB;
-  --area:rgba(233,199,123,.13);
+  /* tema "navy & sand" */
+  --bg:#F4F1EA; --surface:#FFFFFF; --raise:#EAE4D8; --line:#E4DED2; --dash:#B9B0A0;
+  --text:#1C1917; --muted:#6B6358; --label:#6B6358;
+  --accent:#1E3A8A; --on-accent:#FFFFFF; --hero:#1E3A8A; --hero-hi:#FCD58A;
+  --good:#2F7D4F; --good-bg:#E1F0E6; --good-ink:#1F5C38;
+  --bad:#C4483B; --bad-bg:#F8E0DC; --bad-ink:#8A2A20;
+  --area:rgba(30,58,138,.09);
   /* nomi usati anche dal codice dei grafici */
   --ink:var(--text); --soft:var(--raise); --cream:var(--surface);
-  --sh:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.18);
+  --sh:0 1px 2px rgba(16,24,40,.06),0 2px 6px rgba(16,24,40,.06);
   --f-display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  color-scheme:dark;
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
@@ -63,7 +63,7 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .title-m{font-size:17px}
 
 /* cards */
-.hero{background:var(--hero);color:var(--text);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--sh)}
+.hero{background:var(--hero);color:#fff;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--sh)}
 .hero .label{color:var(--hero-hi)}
 .hero .big{font-family:var(--f-display);font-weight:700;font-size:21px;line-height:1.15}
 .hero .sub{color:#C9D3EA}
@@ -71,7 +71,7 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .btn:active{filter:brightness(.92)}
 .btn-accent{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
 .btn-ink{background:var(--text);color:var(--bg);border-color:var(--text)}
-.btn-dash{background:transparent;border:1px dashed #44527A;font-size:14px;min-height:42px;color:var(--muted)}
+.btn-dash{background:transparent;border:1px dashed var(--dash);font-size:14px;min-height:42px;color:var(--muted)}
 .btn-plain{background:var(--surface);font-size:14px;min-height:40px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .gcard{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 12px;display:flex;flex-direction:column;gap:5px;min-height:84px;text-decoration:none;color:inherit;box-shadow:var(--sh)}
@@ -82,19 +82,19 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 
 .list{display:flex;flex-direction:column;gap:8px}
 .erow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 12px;min-height:56px;text-decoration:none;color:inherit;box-shadow:var(--sh)}
-.tick{width:30px;height:30px;font-family:var(--f-mono);font-weight:700;font-size:11.5px;flex:none;border:1.5px solid #44527A;border-radius:50%;display:grid;place-items:center}
+.tick{width:30px;height:30px;font-family:var(--f-mono);font-weight:700;font-size:11.5px;flex:none;border:1.5px solid var(--dash);border-radius:50%;display:grid;place-items:center}
 .erow.done .tick{background:var(--good);border-color:var(--good)}
-.erow.part .tick{border-color:var(--accent);color:var(--accent)}
+.erow.part .tick{border-color:var(--accent);color:var(--accent);background:#E3E8F4}
 .ename{font-family:var(--f-display);font-weight:650;font-size:16px;line-height:1.2}
 .esub{font-size:13px;color:var(--muted)}
 .eval{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none;font-family:var(--f-mono)}
-.eval b{font-size:15px;color:var(--hero-hi)}
+.eval b{font-size:15px;color:var(--accent)}
 .eval span{font-size:12.5px;color:var(--muted)}
 .bar{flex:1;height:8px;background:var(--raise);border-radius:9px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:9px}
 .sets{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sdots{display:flex;gap:5px;flex:1;min-width:0;flex-wrap:wrap}
-.sdots i{width:22px;height:22px;border:1.5px solid #44527A;border-radius:50%;display:grid;place-items:center}
+.sdots i{width:22px;height:22px;border:1.5px solid var(--dash);border-radius:50%;display:grid;place-items:center}
 .sdots i.on{background:var(--good);border-color:var(--good)}
 .sdots i.extra{background:var(--raise);border-color:var(--good)}
 .mini{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--raise)}
@@ -119,26 +119,26 @@ main{flex:1;padding:16px max(16px,env(safe-area-inset-left)) 20px;display:flex;f
 .prow:last-child{border-bottom:0}
 .prow .x{width:36px;height:36px;border:0;background:transparent;border-radius:10px;display:grid;place-items:center;margin:-6px -8px -6px 0;color:var(--muted)}
 .phead{padding:8px 12px;background:var(--raise);color:var(--label);font-family:var(--f-mono);font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
-.empty{padding:16px 14px;text-align:center;color:var(--muted);background:transparent;border:1px dashed #44527A;border-radius:14px}
+.empty{padding:16px 14px;text-align:center;color:var(--muted);background:transparent;border:1px dashed var(--dash);border-radius:14px}
 
 textarea{width:100%;min-height:220px;resize:vertical;border:1px solid var(--line);border-radius:14px;padding:14px;font-family:var(--f-mono);font-size:13px;line-height:1.6;background:var(--surface)}
-textarea::placeholder{color:#6C7894}
+textarea::placeholder{color:#9A9183}
 .field{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
 .field input{border:0;background:transparent;font-family:var(--f-mono);font-weight:700;font-size:15px;flex:1;min-width:0}
-.warn{display:flex;gap:8px;align-items:flex-start;padding:9px 12px;font-size:13px;background:rgba(233,199,123,.12);color:var(--hero-hi)}
+.warn{display:flex;gap:8px;align-items:flex-start;padding:9px 12px;font-size:13px;background:#FBF1DA;color:#7A5A12}
 .links{display:flex;flex-wrap:wrap;gap:8px}
 .links button{flex:1 1 140px}
 
 nav{position:sticky;bottom:0;display:flex;justify-content:space-around;align-items:center;padding:6px 12px calc(8px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line);z-index:5}
 nav a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--muted);font-weight:650;font-size:12px;min-width:72px;padding:5px 10px;border-radius:12px}
-nav a[aria-current="page"]{background:var(--raise);color:var(--accent)}
+nav a[aria-current="page"]{background:#E3E8F4;color:var(--accent)}
 .sticky-foot{position:sticky;bottom:0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;transition:.2s;pointer-events:none;z-index:9;white-space:nowrap}
 .toast.on{opacity:1;transform:translateX(-50%)}
 /* progressi */
 .pseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
 .pseg button{border:0;border-radius:9px;background:transparent;font-weight:650;font-size:14px;min-height:34px;color:var(--muted)}
-.pseg button[aria-pressed="true"]{background:var(--raise);color:var(--accent)}
+.pseg button[aria-pressed="true"]{background:var(--hero);color:#fff}
 .sumrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .sumrow div{display:flex;flex-direction:column;background:rgba(255,255,255,.07);border-radius:10px;padding:8px 10px}
 .sumrow b{font-family:var(--f-mono);font-size:22px;line-height:1.1}
@@ -146,7 +146,7 @@ nav a[aria-current="page"]{background:var(--raise);color:var(--accent)}
 .spark-wrap{width:96px;flex:none}
 .spark{display:block;width:96px;height:34px}
 .big{display:block;width:100%;height:auto;margin-top:10px}
-.ax{font-family:var(--f-mono);font-size:10px;fill:#93A0BA}
+.ax{font-family:var(--f-mono);font-size:10px;fill:#7A7266}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .lg-dot{width:10px;height:10px;border-radius:50%;background:var(--text);border:2px solid var(--text);display:inline-block}
@@ -161,7 +161,7 @@ nav a[aria-current="page"]{background:var(--raise);color:var(--accent)}
 .timer{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .timer.done{border-color:var(--good);background:linear-gradient(var(--good-bg),var(--good-bg)),var(--surface)}
 .tauto{border:1px solid var(--line);border-radius:999px;background:transparent;font-weight:650;font-size:12.5px;padding:6px 12px;min-height:34px;display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
-.tauto[aria-pressed="true"]{background:var(--raise);color:var(--text)}
+.tauto[aria-pressed="true"]{background:#E3E8F4;color:var(--accent)}
 .tring{position:relative;width:136px;height:136px;margin:0 auto}
 .tring svg{width:100%;height:100%;display:block}
 .tring circle{transition:stroke-dashoffset .25s linear}
@@ -209,7 +209,7 @@ var I = {
   back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
   plus:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
   minus:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
-  check:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E1729" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  check:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
   checkInk:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
   x:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   flame:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c1 3 4 5 4 9a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-8z"/></svg>',
@@ -334,7 +334,7 @@ function timerHtml(){
   return '<section class="timer'+(T.done?" done":"")+'" aria-label="Rest timer">'+
     '<div class="row between"><h2 class="title-m">Rest</h2><button class="tauto" data-act="tauto" aria-pressed="'+T.auto+'">'+(T.auto?I.checkInk:"")+'Auto-start on Save</button></div>'+
     '<div class="tstage"><div class="tring"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="84" fill="none" style="stroke:var(--soft)" stroke-width="16"/>'+
-      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#4CC38A":"#E9C77B")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
+      '<circle id="tarc" cx="100" cy="100" r="84" fill="none" stroke="'+(T.done?"#2F7D4F":"#1E3A8A")+'" stroke-width="16" stroke-linecap="round" stroke-dasharray="'+RING.toFixed(1)+'" stroke-dashoffset="'+(RING*(1-frac)).toFixed(1)+'" transform="rotate(-90 100 100)"/></svg>'+
       '<div class="tcenter"><span id="tdisp" class="tdisp" role="timer" aria-live="off">'+(T.done?"Go!":fmtT(rem))+'</span><span id="tstate" class="label" style="color:var(--muted)">'+state+'</span></div></div>'+
       (T.done ? bellSay("go",64,"Go! Next set") : T.running ? bellSay("rest",64,"Breathe…") : T.left!=null ? bellSay("sleep",64,"Paused") : bellSay("hi",64,"Rest between sets"))+'</div>'+
     '<div class="tdur" role="group" aria-label="Duration">'+opts+'</div>'+
@@ -526,8 +526,8 @@ function vEx(id){
 }
 
 /* ---------- progressi (sola lettura): generale → gruppo → esercizio ---------- */
-/* colori dei grafici (tema scuro) */
-var CH = { ink:"#F2EEE6", hollow:"#17223B", halo:"#17223B", grid:"#2A3858" };
+/* colori dei grafici */
+var CH = { ink:"#1C1917", hollow:"#FFFFFF", halo:"#FFFFFF", grid:"#E4DED2" };
 var P = { m:"kg", r:"all", ov:"lines" };
 var METRICS = {
   "kg": { label:"Weight", info:"The heaviest weight you lifted in each workout." },
