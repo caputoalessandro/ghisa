@@ -647,7 +647,10 @@ function overallChart(lines, mode){
   if (!lines.length) return '<div class="empty" style="padding:14px">The chart shows up once an exercise has two workouts.</div>';
   var W=320, H=190, L=42, R=14, T=16, B=26;
   var avg = avgLine(lines), all = [];
-  lines.forEach(function(l){ all = all.concat(l.pts); });
+  /* una linea per gruppo: la media dei suoi esercizi */
+  var groups = []; lines.forEach(function(l){ if (groups.indexOf(l.g)<0) groups.push(l.g); });
+  var glines = groups.map(function(gr){ return {g:gr, pts:avgLine(lines.filter(function(l){return l.g===gr;}))}; });
+  glines.forEach(function(l){ all = all.concat(l.pts); });
   var shown = mode==="avg" ? avg : all;
   var dts = all.map(function(p){return dnum(p.date);}), x0=Math.min.apply(null,dts), x1=Math.max.apply(null,dts);
   var vs = shown.map(function(p){return p.v;}).concat([0]), mn=Math.min.apply(null,vs), mx=Math.max.apply(null,vs);
@@ -667,16 +670,15 @@ function overallChart(lines, mode){
       '<circle cx="'+X(last.date).toFixed(1)+'" cy="'+Y(last.v).toFixed(1)+'" r="5.5" style="fill:var(--accent)" stroke="#1A1A1A" stroke-width="2"/>'+
       '<text x="'+(X(last.date)-9).toFixed(1)+'" y="'+(Y(last.v)+(last.v>=0?-9:16)).toFixed(1)+'" text-anchor="end" class="ax" style="font-weight:700;fill:#1A1A1A;font-size:12px;paint-order:stroke;stroke:#fff;stroke-width:3px">'+fmtPct(last.v)+'</text>';
   } else {
-    body = lines.map(function(l){
+    body = glines.map(function(l){
       var c = l.g.color, last = l.pts[l.pts.length-1];
-      return '<polyline points="'+pl(l.pts)+'" fill="none" stroke="'+c+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>'+
-        '<circle cx="'+X(last.date).toFixed(1)+'" cy="'+Y(last.v).toFixed(1)+'" r="3.2" fill="'+c+'" stroke="#1A1A1A" stroke-width="1.2"/>';
+      return '<polyline points="'+pl(l.pts)+'" fill="none" stroke="'+c+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'+
+        '<circle cx="'+X(last.date).toFixed(1)+'" cy="'+Y(last.v).toFixed(1)+'" r="4" fill="'+c+'" stroke="#1A1A1A" stroke-width="1.5"/>';
     }).join("");
   }
   var xl = '<text x="'+L+'" y="'+(H-8)+'" class="ax">'+shortDate(all.reduce(function(a,p){return p.date<a?p.date:a;}, all[0].date))+'</text><text x="'+(W-R)+'" y="'+(H-8)+'" text-anchor="end" class="ax">'+shortDate(all.reduce(function(a,p){return p.date>a?p.date:a;}, all[0].date))+'</text>';
-  var groups = []; lines.forEach(function(l){ if (groups.indexOf(l.g)<0) groups.push(l.g); });
   var legend = mode==="avg" ? '<span><i class="lg-dot"></i>average of '+lines.length+' exercises vs their first workout</span>'
-    : groups.map(function(gr){ return '<span><i class="lg-line" style="background:'+gr.color+'"></i>'+esc(gr.name)+'</span>'; }).join("");
+    : glines.map(function(l){ var v = l.pts[l.pts.length-1].v; return '<span><i class="lg-line" style="background:'+l.g.color+'"></i>'+esc(l.g.name)+' '+fmtPct(v)+'</span>'; }).join("");
   return '<svg viewBox="0 0 '+W+' '+H+'" class="big" role="img" aria-label="Overall progress">'+g+body+xl+'</svg><div class="legend">'+legend+'</div>';
 }
 
@@ -696,7 +698,7 @@ function vProg(){
   var lines = overallLines(S.groups), avg = lines.length ? avgLine(lines) : [];
   var overall = '<section class="logcard" style="gap:8px"><div class="row between"><h2 class="title-m">Overall progress</h2>'+
     (avg.length?'<span class="tag '+(avg[avg.length-1].v>=2?"up":avg[avg.length-1].v<=-2?"scarse":"")+'">'+fmtPct(avg[avg.length-1].v)+'</span>':'')+'</div>'+
-    pseg("pov", P.ov, [["lines","Each exercise"],["avg","Average"]])+overallChart(lines, P.ov)+'</section>';
+    pseg("pov", P.ov, [["lines","Each group"],["avg","Average"]])+overallChart(lines, P.ov)+'</section>';
   var cards = S.groups.map(function(g){
     var ts = trendsOf(g), u = ts.filter(function(i){return i.t.kind==="up";}).length, dn = ts.filter(function(i){return i.t.kind==="down";}).length;
     var gl = overallLines([g]), ga = gl.length ? avgLine(gl) : [];
