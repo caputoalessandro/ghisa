@@ -212,6 +212,13 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .opt{display:flex;flex-direction:column;gap:8px}
 .opt .seg button{min-height:48px;font-size:15px}
 .opt .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* bottoni dei dolori con la mascotte crocerossina */
+.btn-nurse{min-height:60px;padding:4px 16px;gap:12px}
+.btn-nurse .bell{width:44px;height:auto;flex:none}
+/* scelta colore del gruppo */
+.swatches{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+.swatches button{aspect-ratio:1;border:var(--bw) solid var(--line);border-radius:50%;display:grid;place-items:center;color:#111;padding:0}
+.swatches button[aria-pressed="true"]{box-shadow:3px 3px 0 var(--line);transform:translate(-1px,-1px)}
 /* promemoria backup */
 .bkcard{background:#FFD23F;color:#111;border:var(--bw) solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .bkcard p{margin:0;font-size:14px;font-weight:600}
@@ -288,7 +295,8 @@ var KEY = "ghisa-v1";
 /* colori dei gruppi: pieni e chiari, così sopra ci sta il testo nero in entrambi i temi */
 var COLORS = ["#B6F23A","#2EE6D0","#7AB0FF","#FF8A5C","#FFD23F","#C9A2FF","#5EEA8F","#FF7AB6"];
 /* il colore dipende dalla posizione del gruppo, così anche i gruppi già salvati prendono la nuova palette */
-function gColor(g){ var i = S.groups.indexOf(g); return COLORS[(i<0?0:i)%COLORS.length]; }
+/* g.c è il colore scelto dall'utente; senza scelta vale la posizione del gruppo */
+function gColor(g){ if (g.c && COLORS.indexOf(g.c)>=0) return g.c; var i = S.groups.indexOf(g); return COLORS[(i<0?0:i)%COLORS.length]; }
 var SEED2 = "SPALLE\nCavo - 4kg - 16\nLateral raise manubri — 12kg - 8 scarse\n\nBICIPITI\nHummer curl - 18kg - 5\n\nPETTO\nChest inclined - 20kg - 9\nGAMBE\nHip trust dischi - 35kg - 10";
 var SEED = "SPALLE\nMilitarypress — 9kg - 7\nCavo - 4kg - 16\nLateral raise manubri — 12kg - 8 scarse\nMacchina - 50kg - 7\n\nBICIPITI\nBilanciere curl — 6kg - 6\nHummer curl - 18kg - 5\nPanca Scott — 11kg - 8 scarse\nIncline dumbbell curl — 10KG - 10\n\nPETTO\nPanca piana- 22,5 kg - 4\nChest press - 27,5kg - 12\nChest inclined - 20kg - 9\nPanca inclined - 17,5kg - 5\nPec dek - 45kg-12\n\nTRICIPITI\nClose grip bench press - 18kg - 8\nCable overhead triceps extension -18kg - 12\nCable triceps pushdown (basso) — 18kg - 17\n\nGAMBE\nSquat - 15kg - 10\nHip trust macchina cavo - 80kg - 10\nHip trust dischi - 35kg - 10";
 
@@ -330,7 +338,7 @@ en: {
   ex1:"{0} exercise", exN:"{0} exercises", gymLog:"Gym log", thisWeek:"{0} this week", niceWork:"Nice work today!", yourGroups:"Your groups", newGroup:"New group",
   todaySets:"Today · {0} of {1} sets", lastTime:"Last time · {0}", noSetsYet:"No sets yet · {0} sets", barely:"barely",
   todayDay:"Today · {0}", allDone:"All done!", toGo:"{0} to go!", letsGo:"Let's go!", noExYet:"No exercises yet. Add one below.", addEx:"Add exercise",
-  renGroup:"Rename group", delGroup:"Delete group", done:"Done", nOfM:"{0} of {1}",
+  gColorL:"Color", gColorAria:"Group color", renGroup:"Rename group", delGroup:"Delete group", done:"Done", nOfM:"{0} of {1}",
   sets:"Sets", setsDoneAria:"{0} of {1} sets done", setsGoal:"Sets goal", oneLess:"One set less", oneMore:"One set more", goal:"goal {0}",
   saveSet:"Save set {0}/{1}", extraSet:"Extra set", todaysSets:"Today's sets", delSet:"Delete set", lastTimeC:"Last time:",
   weightStep:"Weight · step 1.25 kg", remKg:"Remove 1.25 kg", addKg:"Add 1.25 kg", reps:"Reps", repLess:"One rep less", repMore:"One rep more",
@@ -392,7 +400,7 @@ it: {
   ex1:"{0} esercizio", exN:"{0} esercizi", gymLog:"Diario palestra", thisWeek:"{0} in settimana", niceWork:"Ottimo lavoro oggi!", yourGroups:"I tuoi gruppi", newGroup:"Nuovo gruppo",
   todaySets:"Oggi · {0} di {1} serie", lastTime:"L'ultima volta · {0}", noSetsYet:"Ancora nessuna serie · {0} serie", barely:"scarse",
   todayDay:"Oggi · {0}", allDone:"Tutto fatto!", toGo:"Ne mancano {0}!", letsGo:"Si parte!", noExYet:"Ancora nessun esercizio. Aggiungine uno qui sotto.", addEx:"Aggiungi esercizio",
-  renGroup:"Rinomina gruppo", delGroup:"Elimina gruppo", done:"Fatto", nOfM:"{0} di {1}",
+  gColorL:"Colore", gColorAria:"Colore del gruppo", renGroup:"Rinomina gruppo", delGroup:"Elimina gruppo", done:"Fatto", nOfM:"{0} di {1}",
   sets:"Serie", setsDoneAria:"{0} di {1} serie fatte", setsGoal:"Obiettivo serie", oneLess:"Una serie in meno", oneMore:"Una serie in più", goal:"obiettivo {0}",
   saveSet:"Salva serie {0}/{1}", extraSet:"Serie extra", todaysSets:"Serie di oggi", delSet:"Elimina serie", lastTimeC:"L'ultima volta:",
   weightStep:"Peso · passo 1,25 kg", remKg:"Togli 1,25 kg", addKg:"Aggiungi 1,25 kg", reps:"Ripetizioni", repLess:"Una ripetizione in meno", repMore:"Una ripetizione in più",
@@ -922,6 +930,7 @@ var bellN = 0;
 function bell(mood, size){
   /* versione "aerobica anni '80": fascia e polsini fluo, scaldamuscoli, tramonto a righe, occhiali a persiana */
   var u = "bc"+(++bellN), ink = "#1A1A1A", iron = "#6E7480", pink = "#FF4FA3", cyan = "#2EE6E6";
+  var nurse = mood==="nurse", band = nurse ? "#FFFFFF" : pink, red = "#E5372A";
   var body = "M48.4 126 A42 42 0 1 1 91.6 126 Z";
   var o = [];
   o.push('<ellipse cx="70" cy="143" rx="32" ry="4.5" fill="#000" opacity=".14"/>');
@@ -933,9 +942,10 @@ function bell(mood, size){
   o.push('<defs><linearGradient id="'+u+'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD23F"/><stop offset=".5" stop-color="'+pink+'"/><stop offset="1" stop-color="#7B3FF2"/></linearGradient><clipPath id="'+u+'"><path d="'+body+'"/></clipPath></defs>');
   o.push('<path d="'+body+'" fill="'+iron+'"/>');
   o.push('<g clip-path="url(#'+u+')"><rect x="20" y="104" width="100" height="30" fill="url(#'+u+'g)"/><path d="M20 112 h100 M20 118 h100 M20 123 h100" stroke="'+iron+'" stroke-width="2.5"/>'+
-    '<rect x="20" y="58" width="100" height="14" fill="'+pink+'"/><path d="M20 58 h100 M20 72 h100" stroke="'+ink+'" stroke-width="3"/></g>');
+    '<rect x="20" y="58" width="100" height="14" fill="'+band+'"/><path d="M20 58 h100 M20 72 h100" stroke="'+ink+'" stroke-width="3"/></g>');
+  if (nurse) o.push('<path d="M66.5 59.5 h7 v3 h3 v6 h-3 v3 h-7 v-3 h-3 v-6 h3 z" fill="'+red+'"/>');
   o.push('<path d="'+body+'" fill="none" stroke="'+ink+'" stroke-width="4.5" stroke-linejoin="round"/>');
-  o.push('<path d="M109 63 l13 -7 l-2 11 z M109 68 l13 5 l-7 6 z" fill="'+pink+'" stroke="'+ink+'" stroke-width="2.5" stroke-linejoin="round"/>');
+  o.push('<path d="M109 63 l13 -7 l-2 11 z M109 68 l13 5 l-7 6 z" fill="'+band+'" stroke="'+ink+'" stroke-width="2.5" stroke-linejoin="round"/>');
   o.push('<path d="M40 86 A31 31 0 0 1 50 74" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".35"/>');
   function arm(d, hx, hy){ return '<path d="'+d+'" fill="none" stroke="'+ink+'" stroke-width="9" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+iron+'" stroke-width="3.5" stroke-linecap="round"/><circle cx="'+hx+'" cy="'+hy+'" r="6.5" fill="'+iron+'" stroke="'+ink+'" stroke-width="3"/><rect x="'+(hx-6)+'" y="'+(hy-12)+'" width="12" height="6" rx="2" fill="'+cyan+'" stroke="'+ink+'" stroke-width="2"/>'; }
   var A = {
@@ -958,6 +968,11 @@ function bell(mood, size){
   function drop(x,y){ return '<path d="M'+x+' '+y+' c-4 6 -5.5 9 -5.5 11.5 a5.5 5.5 0 0 0 11 0 c0 -2.5 -1.5 -5.5 -5.5 -11.5z" fill="#7CC8FF" stroke="'+ink+'" stroke-width="2.2"/>'; }
   var x = "";
   if (mood==="hi")    x = A.wave + shades(0) + M.smile;
+  if (nurse)          x = arm("M31 98 Q20 108 22 117",22,118) + arm("M109 98 Q121 104 121 112",121,113) +
+    '<rect x="104" y="108" width="30" height="22" rx="3" fill="#fff" stroke="'+ink+'" stroke-width="3"/><path d="M114 104 v4 h10 v-4" fill="none" stroke="'+ink+'" stroke-width="3"/>'+
+    '<path d="M116.5 112 h5 v4 h4 v5 h-4 v4 h-5 v-4 h-4 v-5 h4 z" fill="'+red+'"/>' +
+    [57,83].map(function(cx){ return '<ellipse cx="'+cx+'" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="'+ink+'" stroke-width="3"/><circle cx="'+cx+'" cy="94" r="4.3" fill="'+ink+'"/><circle cx="'+(cx+1.6)+'" cy="92" r="1.4" fill="#fff"/>'; }).join("") +
+    M.smile + '<circle cx="47" cy="104" r="5" fill="#F28B9B" opacity=".75"/><circle cx="93" cy="104" r="5" fill="#F28B9B" opacity=".75"/>';
   if (mood==="flex")  x = A.flex + shades(0) + M.grin + star(8,40,7) + star(132,36,6);
   if (mood==="go")    x = A.cheer + shades(0) + M.grin + star(70,6,7) + star(6,70,5) + star(134,72,5);
   if (mood==="rest")  x = A.down + '<path d="M48 92 h18 M74 92 h18" stroke="'+ink+'" stroke-width="4" stroke-linecap="round"/>' + M.pant + drop(112,50) + drop(24,58);
@@ -1015,7 +1030,7 @@ function vHome(){
     bellSay(trainedToday?"flex":"hi", 104, trainedToday?t("niceWork"):GREET, "home")+'</div>'+hero+backupCard()+
     '<div class="row between" style="align-items:baseline;margin-top:4px"><h2 class="title-m">'+t("yourGroups")+'</h2><span class="mono muted" style="font-size:12px">'+tn(nEx,"ex1","exN")+'</span></div>'+
     '<div class="grid2">'+cards+'<button class="btn btn-dash gnew" data-act="newGroup">'+I.plus+t("newGroup")+'</button></div>'+
-    '<a class="btn btn-plain" href="#/pain">'+I.zap+t("reportPain")+'</a></main>'+navBar("home");
+    '<a class="btn btn-plain btn-nurse" href="#/pain">'+bell("nurse",44)+t("reportPain")+'</a></main>'+navBar("home");
 }
 
 function backupCard(){
@@ -1048,6 +1063,8 @@ function vGroup(id){
     '<div class="row" style="margin-top:6px"><div class="bar"><i style="width:'+pct+'%;background:'+gColor(g)+'"></i></div><span class="mono" style="font-weight:700;font-size:13px">'+done+'/'+n+'</span></div></div>'+
     '<div class="list">'+(rows||'<div class="empty">'+bellSay("sleep",70,"")+t("noExYet")+'</div>')+'</div>'+
     '<button class="btn btn-dash" data-act="newEx" data-id="'+g.id+'">'+I.plus+t("addEx")+'</button>'+
+    '<section class="opt"><h2 class="title-m">'+t("gColorL")+'</h2><div class="swatches" role="group" aria-label="'+t("gColorAria")+'">'+COLORS.map(function(c){
+      return '<button data-act="gcolor" data-id="'+g.id+'" data-v="'+c+'" aria-pressed="'+(gColor(g)===c)+'" aria-label="'+c+'" style="background:'+c+'">'+(gColor(g)===c?I.checkInk:'')+'</button>'; }).join("")+'</div></section>'+
     '<div class="links"><button class="btn btn-plain" data-act="renGroup" data-id="'+g.id+'">'+t("renGroup")+'</button><button class="btn btn-plain" data-act="delGroup" data-id="'+g.id+'">'+t("delGroup")+'</button></div>'+
     '</main><div class="sticky-foot"><a class="btn btn-ink" data-back href="#/">'+t("done")+'</a></div>';
 }
@@ -1108,7 +1125,7 @@ function vEx(id){
       '<div class="seg"><button data-act="clean" aria-pressed="'+!dr.scarse+'">'+t("clean")+'</button><button class="sc" data-act="scarse" aria-pressed="'+dr.scarse+'">'+(dr.scarse?I.checkInk:"")+t("barelyB")+'</button></div>'+
       '<button class="btn btn-accent" data-act="saveLog" data-id="'+id+'"><span>'+saveLbl+' · '+fmtNum(dr.kg)+' kg × '+dr.reps+' reps</span></button>'+
     '</section>'+timerHtml()+todayHtml+
-    '<a class="btn btn-plain" href="#/pain/'+id+'">'+I.zap+t("painQ")+'</a>'+
+    '<a class="btn btn-plain btn-nurse" href="#/pain/'+id+'">'+bell("nurse",44)+t("painQ")+'</a>'+
     '<div class="links"><button class="btn btn-plain" data-act="renEx" data-id="'+id+'">'+t("rename")+'</button><button class="btn btn-plain" data-act="delEx" data-id="'+id+'">'+t("delEx")+'</button></div>'+
     '</main>';
 }
@@ -1440,7 +1457,7 @@ function vPain(exId){
       '<button class="x" data-act="delPain" data-id="'+p.id+'" aria-label="'+t("delReport")+'">'+I.x+'</button></div>';
   }).join("");
   return '<main>'+topBack(exId ? "#/e/"+exId : "#/")+
-    '<div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">'+t("painQ")+'</span><h1 class="title-l">'+t("reportPain")+'</h1></div>'+bellSay("think",72,t("painBubble"))+'</div>'+
+    '<div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">'+t("painQ")+'</span><h1 class="title-l">'+t("reportPain")+'</h1></div>'+bellSay("nurse",72,t("painBubble"))+'</div>'+
     '<section class="opt"><h2 class="title-m">'+t("whereHurt")+'</h2><div class="agrid" role="group">'+areas+'</div></section>'+
     '<section class="opt"><h2 class="title-m">'+t("when")+'</h2><div class="seg" role="group"><button data-act="pmode" data-v="gen" aria-pressed="'+(PF.mode==="gen")+'">'+t("inGeneral")+'</button><button data-act="pmode" data-v="ex" aria-pressed="'+(PF.mode==="ex")+'">'+t("duringEx")+'</button></div>'+
       (PF.mode==="ex" ? '<label class="field"><span class="label" style="color:var(--muted)">'+t("whichEx")+'</span><select id="painex">'+opts+'</select></label>' : '')+'</section>'+
@@ -1455,7 +1472,7 @@ function vAdv(id){
   var f = p.exId && findEx(p.exId), cat = f ? exCat(f.ex, f.g) : null, spec = cat ? advFor(p.area, cat) : null;
   function ul(list){ return '<ul class="advl">'+L(list).map(function(s){ return '<li>'+esc(s)+'</li>'; }).join("")+'</ul>'; }
   return '<main>'+topBack(parentOf(curHash())||"#/")+
-    '<div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">'+esc(dayLabel(p.date))+' · '+t("lvl"+p.level)+'</span><h1 class="title-l">'+esc(t("painTitle", t("areaIn")[p.area]))+'</h1></div>'+bellSay("rest",72,t("takeCare"))+'</div>'+
+    '<div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">'+esc(dayLabel(p.date))+' · '+t("lvl"+p.level)+'</span><h1 class="title-l">'+esc(t("painTitle", t("areaIn")[p.area]))+'</h1></div>'+bellSay("nurse",72,t("takeCare"))+'</div>'+
     (p.red ? '<div class="alert">'+I.zap+'<p>'+esc(t("redFlag"))+'</p></div>' : '')+
     '<section class="hero"><span class="label">'+t("whatToDo")+'</span><p class="lvltxt">'+esc(t("lvlTxt"+p.level))+'</p></section>'+
     (spec ? '<section class="logcard"><h2 class="title-m">'+esc(t("onEx", f.ex.name))+'</h2>'+ul(spec)+'</section>' : '')+
@@ -1582,14 +1599,17 @@ app.addEventListener("click", function(e){
   else if (act==="kg" || act==="reps"){ d = readDraft(); var step = parseFloat(b.getAttribute("data-d"));
     if (act==="kg") d.kg = Math.max(0, Math.round((d.kg+step)*100)/100); else d.reps = Math.max(0, d.reps+step);
     rerender(true); }
+  else if (act==="gcolor"){ findGroup(id).c = b.getAttribute("data-v"); save(); rerender(true); }
   else if (act==="sgoal"){ var fx = findEx(id); readDraft(); fx.ex.sets = Math.max(1, Math.min(10, setsGoal(fx.ex)+parseInt(b.getAttribute("data-d"),10))); save(); rerender(true); }
   else if (act==="clean" || act==="scarse"){ d = readDraft(); d.scarse = act==="scarse"; rerender(true); }
   else if (act==="saveLog"){ d = readDraft();
     if (!d.reps){ toast(t("addRep")); return; }
     S.logs.push({id:uid(), exId:id, date:today(), kg:d.kg, reps:d.reps, scarse:d.scarse, t:Date.now()}); d.scarse=false; save();
     var fs = findEx(id), nd = S.logs.filter(function(l){return l.exId===id && l.date===today();}).length, gl = setsGoal(fs.ex);
-    if (T.auto) timerStart(T.dur); rerender(true);
-    toast(nd===gl ? t("allSetsDone", gl) : t("setSaved", nd, gl)+(T.auto?t("restStarted"):"")); }
+    /* dopo l'ultima serie (e le extra) non serve recuperare */
+    var rest = T.auto && nd<gl;
+    if (rest) timerStart(T.dur); rerender(true);
+    toast(nd===gl ? t("allSetsDone", gl) : t("setSaved", nd, gl)+(rest?t("restStarted"):"")); }
   else if (act==="tset"){ T.dur = +b.getAttribute("data-v"); tSave(); timerStart(T.dur); rerender(true); }
   else if (act==="tpause"){ if (T.running){ T.left = Math.max(0, T.end-Date.now()); T.running=false; releaseWake(); tSave(); } else if (T.left!=null){ timerStart(T.left/1000, true); } rerender(true); }
   else if (act==="tadd"){ if (T.running) T.end += 15000; else if (T.left!=null) T.left += 15000; T.total += 15000; tSave(); tick(); }
