@@ -212,6 +212,14 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .opt{display:flex;flex-direction:column;gap:8px}
 .opt .seg button{min-height:48px;font-size:15px}
 .opt .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* lista esercizi */
+button.prow.pick{width:100%;border:0;border-bottom:2px solid var(--line);background:transparent;text-align:left;color:var(--text);min-height:52px;cursor:pointer}
+button.prow.pick:last-child{border-bottom:0}
+button.prow.pick:active{background:var(--raise)}
+button.prow.custom{background:var(--hero);color:#111}
+.field input[type=search]{font-family:var(--f-body);font-weight:700;font-size:16px;padding:6px 0;-webkit-appearance:none;appearance:none}
+.linkrow{gap:10px;font-size:13px;font-weight:700}
+.linkrow .btn{width:auto;min-height:34px;font-size:12px;padding:4px 10px;flex:none}
 /* bottoni dei dolori con la mascotte crocerossina */
 .btn-nurse{min-height:60px;padding:4px 16px;gap:12px}
 .btn-nurse .bell{width:44px;height:auto;flex:none}
@@ -368,7 +376,9 @@ en: {
   confRestore:"Replace your current data with this backup?", restored:"Backup restored", badBackup:"Not a valid backup file",
   history:"Workout history", prevMonth:"Previous month", nextMonth:"Next month", monthW1:"{0} workout this month", monthWN:"{0} workouts this month",
   noWorkMonth:"No workouts this month.", set1:"{0} set", setN:"{0} sets", dayEmpty:"No workouts on this day.", lgPain:"pain", calQuiet:"Rest days count too!", calBusy:"Look at you go!",
-  howSetup:"How to set up", forToday:"For today", wrTitle:"Weight & reps",
+  howSetup:"How to set up", searchPh:"Search or type a name", useCustom:"Add “{0}” as a new exercise", suggested:"Suggested for {0}", allEx:"All exercises",
+  noMatch:"Nothing in the list: you can add it with your own name.", inGroup:"already here", linkTitle:"Pick from the list", linkInfo:"Choose the exercise that matches “{0}”: the name stays the same, the tips get more precise.",
+  tipsFor:"Tips for: {0}", notRecog:"Exercise not recognized: these are general tips.", pickFromList:"Pick from the list", changeLink:"Change", forToday:"For today", wrTitle:"Weight & reps",
   sugUp:"Last time every set was clean at {0} kg: try {1} kg today.", sugStay:"Last time some sets were barely made at {0} kg: stay at {0} kg until they're clean.",
   sugRep:"Last time {0} kg × {1} reps, all clean: today try for {2} reps.",
   sugMore:"Last time you did {0} of {1} sets at {2} kg: aim for all {1} today before adding weight.",
@@ -430,7 +440,9 @@ it: {
   confRestore:"Sostituire i dati attuali con questo backup?", restored:"Backup ripristinato", badBackup:"Non è un file di backup valido",
   history:"Storico allenamenti", prevMonth:"Mese precedente", nextMonth:"Mese successivo", monthW1:"{0} allenamento questo mese", monthWN:"{0} allenamenti questo mese",
   noWorkMonth:"Nessun allenamento questo mese.", set1:"{0} serie", setN:"{0} serie", dayEmpty:"Nessun allenamento in questo giorno.", lgPain:"dolore", calQuiet:"Anche il riposo conta!", calBusy:"Che costanza!",
-  howSetup:"Come impostarti", forToday:"Per oggi", wrTitle:"Peso e ripetizioni",
+  howSetup:"Come impostarti", searchPh:"Cerca o scrivi un nome", useCustom:"Aggiungi “{0}” come nuovo esercizio", suggested:"Consigliati per {0}", allEx:"Tutti gli esercizi",
+  noMatch:"Non c'è nella lista: puoi aggiungerlo col tuo nome.", inGroup:"già qui", linkTitle:"Scegli dalla lista", linkInfo:"Scegli l'esercizio che corrisponde a “{0}”: il nome resta lo stesso, i consigli diventano più precisi.",
+  tipsFor:"Consigli per: {0}", notRecog:"Esercizio non riconosciuto: questi sono consigli generali.", pickFromList:"Scegli dalla lista", changeLink:"Cambia", forToday:"Per oggi", wrTitle:"Peso e ripetizioni",
   sugUp:"L'ultima volta tutte le serie pulite a {0} kg: oggi prova {1} kg.", sugStay:"L'ultima volta qualche serie scarsa a {0} kg: resta a {0} kg finché non vengono pulite.",
   sugRep:"L'ultima volta {0} kg × {1} ripetizioni pulite: oggi prova a farne {2}.",
   sugMore:"L'ultima volta hai fatto {0} serie su {1} a {2} kg: oggi punta a farle tutte prima di aumentare.",
@@ -459,6 +471,90 @@ function L(list){ return list.map(function(p){ return p[LANG==="it"?1:0]; }); }
 function fmtNum(n){ var s = fmtKg(n); return LANG==="it" ? s.replace(".",",") : s; }
 
 /* ---------- esercizi: riconoscimento dal nome e consigli su come impostarsi ---------- */
+/* ---------- catalogo esercizi: nome in inglese e italiano, tipo (per i consigli), gruppo muscolare ---------- */
+var LIB = [
+  ["bench_bb","Barbell bench press","Panca piana con bilanciere","bench","chest"],
+  ["bench_db","Dumbbell bench press","Panca piana con manubri","bench","chest"],
+  ["incline_bb","Incline barbell press","Panca inclinata con bilanciere","incline","chest"],
+  ["incline_db","Incline dumbbell press","Panca inclinata con manubri","incline","chest"],
+  ["decline","Decline bench press","Panca declinata","bench","chest"],
+  ["chestpress","Chest press machine","Chest press","chestpress","chest"],
+  ["chestpress_inc","Incline chest press machine","Chest press inclinata","chestpress","chest"],
+  ["pecdeck","Pec deck","Pec deck","fly","chest"],
+  ["fly_db","Dumbbell fly","Croci con manubri","fly","chest"],
+  ["cable_fly","Cable crossover","Croci ai cavi","fly","chest"],
+  ["pushup","Push-up","Piegamenti","pushup","chest"],
+  ["dips","Dips","Dip alle parallele","dips","chest"],
+  ["ohp_bb","Barbell overhead press","Lento avanti con bilanciere","ohp","shoulders"],
+  ["ohp_db","Seated dumbbell press","Lento con manubri","ohp","shoulders"],
+  ["shoulder_machine","Shoulder press machine","Shoulder press alla macchina","ohp","shoulders"],
+  ["arnold","Arnold press","Arnold press","ohp","shoulders"],
+  ["lateral_db","Dumbbell lateral raise","Alzate laterali con manubri","lateral","shoulders"],
+  ["lateral_cable","Cable lateral raise","Alzate laterali al cavo","lateral","shoulders"],
+  ["lateral_machine","Lateral raise machine","Alzate laterali alla macchina","lateral","shoulders"],
+  ["front_raise","Front raise","Alzate frontali","front","shoulders"],
+  ["reverse_pec","Reverse pec deck","Pec deck inverso","reardelt","shoulders"],
+  ["facepull","Face pull","Face pull","reardelt","shoulders"],
+  ["shrug","Shrugs","Scrollate","shrug","shoulders"],
+  ["curl_bb","Barbell curl","Curl con bilanciere","curl","biceps"],
+  ["curl_ez","EZ bar curl","Curl con bilanciere EZ","curl","biceps"],
+  ["curl_db","Dumbbell curl","Curl con manubri","curl","biceps"],
+  ["hammer","Hammer curl","Curl a martello","hammer","biceps"],
+  ["preacher","Preacher curl","Curl alla panca Scott","preacher","biceps"],
+  ["incline_curl","Incline dumbbell curl","Curl su panca inclinata","inclinecurl","biceps"],
+  ["cable_curl","Cable curl","Curl al cavo","curl","biceps"],
+  ["conc_curl","Concentration curl","Curl di concentrazione","curl","biceps"],
+  ["pushdown_rope","Rope pushdown","Pushdown con corda","triceps","triceps"],
+  ["pushdown_bar","Bar pushdown","Pushdown con barra","triceps","triceps"],
+  ["oh_ext_cable","Cable overhead triceps extension","Estensioni sopra la testa al cavo","tri_oh","triceps"],
+  ["oh_ext_db","Dumbbell overhead extension","French press con manubrio","tri_oh","triceps"],
+  ["skull","Skull crusher","French press con bilanciere EZ","tri_oh","triceps"],
+  ["closegrip","Close grip bench press","Panca presa stretta","closegrip","triceps"],
+  ["kickback","Triceps kickback","Kickback","triceps","triceps"],
+  ["squat_bb","Back squat","Squat con bilanciere","squat","legs"],
+  ["goblet","Goblet squat","Goblet squat","squat","legs"],
+  ["front_squat","Front squat","Front squat","squat","legs"],
+  ["hack","Hack squat","Hack squat","legpress","legs"],
+  ["legpress","Leg press","Pressa","legpress","legs"],
+  ["legext","Leg extension","Leg extension","legext","legs"],
+  ["legcurl_lying","Lying leg curl","Leg curl sdraiato","legcurl","legs"],
+  ["legcurl_seated","Seated leg curl","Leg curl seduto","legcurl","legs"],
+  ["lunge","Lunges","Affondi","lunge","legs"],
+  ["bulgarian","Bulgarian split squat","Squat bulgaro","lunge","legs"],
+  ["hipthrust_bb","Barbell hip thrust","Hip thrust con bilanciere","hipthrust","legs"],
+  ["hipthrust_m","Hip thrust machine","Hip thrust alla macchina","hipthrust","legs"],
+  ["glute_bridge","Glute bridge","Ponte glutei","hipthrust","legs"],
+  ["rdl","Romanian deadlift","Stacco rumeno","hinge","legs"],
+  ["deadlift","Deadlift","Stacco da terra","hinge","back"],
+  ["calf","Calf raise","Calf raise","calf","legs"],
+  ["abductor","Hip abduction machine","Abductor","g_legs","legs"],
+  ["latpull","Lat pulldown","Lat machine","pull","back"],
+  ["pullup","Pull-up","Trazioni","pull","back"],
+  ["row_bb","Barbell row","Rematore con bilanciere","row","back"],
+  ["row_db","One-arm dumbbell row","Rematore con manubrio","row","back"],
+  ["cable_row","Seated cable row","Pulley basso","row","back"],
+  ["tbar","T-bar row","T-bar row","row","back"],
+  ["pullover","Straight-arm pulldown","Pullover al cavo","g_back","back"],
+  ["hyper","Back extension","Iperestensioni","hinge","back"],
+  ["crunch","Crunch","Crunch","core","core"],
+  ["cable_crunch","Cable crunch","Crunch al cavo","core","core"],
+  ["plank","Plank","Plank","core","core"],
+  ["leg_raise","Hanging leg raise","Sollevamento gambe","core","core"]
+];
+var LIBM = {}; LIB.forEach(function(e){ LIBM[e[0]] = e; });
+function libName(e){ return e[LANG==="it"?2:1]; }
+var GRPS = { chest:["Chest","Petto"], shoulders:["Shoulders","Spalle"], biceps:["Biceps","Bicipiti"], triceps:["Triceps","Tricipiti"], legs:["Legs","Gambe"], back:["Back","Schiena"], core:["Abs","Addome"] };
+function grpName(k){ return GRPS[k][LANG==="it"?1:0]; }
+function grpOf(g){
+  var n = norm(g ? g.name : "");
+  var rules = [["chest",/(petto|chest|pector)/],["shoulders",/(spall|shoulder|delt)/],["biceps",/(bicip|bicep)/],["triceps",/(tricip|tricep)/],
+    ["legs",/(gamb|leg|glut|quad|coscia)/],["back",/(schiena|back|dorsal)/],["core",/(addom|abs|core|pancia)/]];
+  for (var i=0;i<rules.length;i++) if (rules[i][1].test(n)) return rules[i][0];
+  return null;
+}
+/* nome scritto a mano uguale a un esercizio del catalogo (in una delle due lingue) */
+function autoLib(name){ var n = norm(name); for (var i=0;i<LIB.length;i++) if (norm(LIB[i][1])===n || norm(LIB[i][2])===n) return LIB[i][0]; return null; }
+
 /* l'ordine conta: le regole più specifiche vengono prima */
 var EXCAT = [
   ["tri_oh",  function(n){ return /(tricip|tricep|french|frances|skull)/.test(n) && /(overhead|sopra|french|frances|skull|testa)/.test(n); }],
@@ -489,6 +585,7 @@ var GROUPCAT = [
   ["g_legs", /(gamb|leg|glut|quad|coscia)/], ["g_back", /(schiena|back|dorsal|lat)/]
 ];
 function exCat(ex, g){
+  if (ex.lib && LIBM[ex.lib]) return LIBM[ex.lib][3];
   var n = norm(ex.name), i;
   for (i=0;i<EXCAT.length;i++) if (EXCAT[i][1](n)) return EXCAT[i][0];
   var gn = norm(g ? g.name : "");
@@ -576,6 +673,27 @@ var TIPS = {
   pull:[["Lock your thighs under the pad, chest up.","Blocca le cosce sotto il cuscino, petto in fuori."],
     ["Start by pulling the shoulders down, then drive the elbows down to your sides.","Inizia abbassando le spalle, poi porta i gomiti in basso ai lati."],
     ["Bring the bar to the upper chest, never behind the neck.","Porta la barra alla parte alta del petto, mai dietro la nuca."]],
+  pushup:[["Hands a bit wider than the shoulders, body in a straight line from head to heels.","Mani poco più larghe delle spalle, corpo dritto dalla testa ai talloni."],
+    ["Elbows at about 45° from the body, abs and glutes tight.","Gomiti a circa 45° dal corpo, addome e glutei contratti."],
+    ["Lower the chest close to the floor, then push away. Too hard? Hands on a bench.","Porta il petto vicino al pavimento, poi spingi via. Troppo difficile? Mani su una panca."]],
+  dips:[["Shoulders down and back, chest up.","Spalle basse e indietro, petto in fuori."],
+    ["Lean forward a little for chest, stay upright for triceps.","Inclinati un po' in avanti per il petto, resta dritto per i tricipiti."],
+    ["Go down only until the upper arms are parallel to the floor.","Scendi solo finché le braccia sono parallele al pavimento."]],
+  front:[["Stand tall, abs tight, a small bend in the elbows.","In piedi dritto, addome contratto, gomiti appena piegati."],
+    ["Raise in front of you up to shoulder height, no higher.","Solleva davanti a te fino all'altezza delle spalle, non oltre."],
+    ["No swinging: lower slowly.","Niente slanci: scendi lentamente."]],
+  reardelt:[["Chest against the pad (or stand tall at the cable), shoulders down.","Petto contro il cuscino (o in piedi dritto al cavo), spalle basse."],
+    ["Pull with the elbows out wide, not by squeezing the shoulder blades only.","Tira con i gomiti larghi, non solo stringendo le scapole."],
+    ["Light weight, pause one second at the end.","Peso leggero, fermati un secondo alla fine."]],
+  shrug:[["Stand tall with the arms straight.","In piedi dritto con le braccia distese."],
+    ["Lift the shoulders straight up toward the ears, no rolling.","Solleva le spalle dritte verso le orecchie, senza ruotarle."],
+    ["Pause at the top and lower slowly; keep the head still.","Fermati in alto e scendi lentamente; testa ferma."]],
+  calf:[["Balls of the feet on the edge of the step, knees almost straight.","Avampiede sul bordo dello step, ginocchia quasi distese."],
+    ["Go all the way down for a stretch, then all the way up.","Scendi fino in fondo per allungare, poi sali fino in cima."],
+    ["Pause one second at the top, no bouncing.","Fermati un secondo in alto, senza rimbalzare."]],
+  core:[["Ribs down and lower back neutral: don't pull on your neck.","Costole giù e bassa schiena neutra: non tirare il collo."],
+    ["Move slowly and breathe out as you crunch or lift.","Muoviti lentamente ed espira quando ti chiudi o sollevi."],
+    ["Quality over quantity: stop when your form breaks.","Meglio poche fatte bene: fermati quando la tecnica cede."]],
   g_chest:[["Shoulder blades back and down on every press.","Scapole indietro e in basso in ogni spinta."],
     ["Elbows at about 45° from the body, not flared out at 90°.","Gomiti a circa 45° dal corpo, non aperti a 90°."],
     ["Control the way down and stop where you still feel the chest, not the shoulder.","Controlla la discesa e fermati dove senti ancora il petto e non la spalla."]],
@@ -599,7 +717,7 @@ var WR_TIPS = [["Warm up with 1–2 light sets before your working weight.","Sca
 
 /* ---------- dolori: consigli per zona, generali e per tipo di esercizio ---------- */
 var AREAS = ["neck","shoulder","elbow","wrist","lowback","knee"];
-var ADV_PARENT = { incline:"bench", closegrip:"bench", chestpress:"bench", g_chest:"bench", hammer:"curl", inclinecurl:"curl", preacher:"curl", tri_oh:"triceps", legext:"g_legs", legpress:"g_legs", lunge:"g_legs", legcurl:"g_legs", pull:"row", hinge:"row", g_back:"row" };
+var ADV_PARENT = { pushup:"bench", dips:"triceps", front:"lateral", reardelt:"lateral", shrug:"lateral", incline:"bench", closegrip:"bench", chestpress:"bench", g_chest:"bench", hammer:"curl", inclinecurl:"curl", preacher:"curl", tri_oh:"triceps", legext:"g_legs", legpress:"g_legs", lunge:"g_legs", legcurl:"g_legs", pull:"row", hinge:"row", g_back:"row" };
 var NECK_BACK = [["Keep your neck in line with your back: don't look up at the mirror.","Tieni il collo in linea con la schiena: non alzare lo sguardo verso lo specchio."],
   ["Start the pull with the shoulder blades, not by shrugging.","Inizia la tirata con le scapole, non alzando le spalle."]];
 var ADV = {
@@ -845,7 +963,7 @@ function applyImport(state, parsed, date){
     pg.items.forEach(function(it){
       var ex = g.exercises.filter(function(e){return norm(e.name)===norm(it.name);})[0];
       if (ex && ex.name!==it.name) renamed.push([it.name, ex.name]);
-      if (!ex){ ex = {id:uid(), name:it.name}; g.exercises.push(ex); }
+      if (!ex){ ex = {id:uid(), name:it.name}; var lb = autoLib(it.name); if (lb) ex.lib = lb; g.exercises.push(ex); }
       state.logs.push({id:uid(), exId:ex.id, date:date, kg:it.kg, reps:it.reps, scarse:it.scarse, t:t++});
     });
   });
@@ -1088,9 +1206,38 @@ function tipsHtml(f, ls){
   function ul(list){ return '<ul>'+list.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join("")+'</ul>'; }
   return '<details class="tips"><summary>'+I.bulb+'<span class="grow">'+t("howSetup")+'</span>'+I.down+'</summary><div class="tipsbody">'+
     (hint ? '<div class="hint"><span class="label">'+t("forToday")+'</span><p>'+esc(hint)+'</p></div>' : '')+
+    '<div class="row between linkrow"><span class="grow">'+(f.ex.lib && LIBM[f.ex.lib] ? esc(t("tipsFor", libName(LIBM[f.ex.lib]))) : TIPS[cat] && cat.indexOf("g_")!==0 && cat!=="generic" ? "" : esc(t("notRecog")))+'</span>'+
+      '<a class="btn btn-plain" href="#/x/'+f.g.id+'/'+f.ex.id+'">'+(f.ex.lib ? t("changeLink") : t("pickFromList"))+'</a></div>'+
     ul(L(TIPS[cat]||TIPS.generic))+
     '<span class="label">'+t("wrTitle")+'</span>'+ul(L(WR_TIPS))+'</div></details>';
 }
+/* ---------- aggiungi esercizio dalla lista (o collega uno esistente) ---------- */
+var XQ = "";
+function pickRows(gid, exId, q){
+  var g = findGroup(gid), key = grpOf(g), nq = norm(q), out = "";
+  var used = {}; if (g) g.exercises.forEach(function(e){ if (e.lib) used[e.lib] = e.id; });
+  function row(e){ var here = !exId && used[e[0]];
+    return '<button class="prow pick" data-act="pick" data-v="'+e[0]+'"><span class="grow"><b style="display:block">'+esc(libName(e))+'</b>'+
+      (LANG==="it" && e[1]!==e[2] ? '<span class="mono muted" style="font-size:11.5px">'+esc(e[1])+'</span>' : '')+'</span>'+
+      (here ? '<span class="tag">'+t("inGroup")+'</span>' : '<span class="tag">'+esc(grpName(e[4]))+'</span>')+'</button>'; }
+  var hits = LIB.filter(function(e){ return !nq || norm(e[1]+" "+e[2]).indexOf(nq)>=0; });
+  if (q.trim() && !exId) out += '<button class="prow pick custom" data-act="pick" data-v="">'+I.plus+'<span class="grow"><b>'+esc(t("useCustom", q.trim()))+'</b></span></button>';
+  var mine = key ? hits.filter(function(e){ return e[4]===key; }) : [], rest = hits.filter(function(e){ return e[4]!==key; });
+  if (mine.length) out += '<div class="phead">'+esc(t("suggested", grpName(key)))+'</div>'+mine.map(row).join("");
+  if (rest.length) out += '<div class="phead">'+t("allEx")+'</div>'+rest.map(row).join("");
+  if (!hits.length) out += '<div class="prow muted">'+t("noMatch")+'</div>';
+  return out;
+}
+function vPick(gid, exId){
+  var g = findGroup(gid); if (!g) return vHome();
+  var f = exId && findEx(exId);
+  return '<main>'+topBack(f ? "#/e/"+exId : "#/g/"+gid)+
+    '<div><span class="label">'+esc(f ? f.ex.name : g.name)+'</span><h1 class="title-l">'+(f ? t("linkTitle") : t("addEx"))+'</h1></div>'+
+    (f ? '<p class="muted" style="margin:0;font-size:14px">'+esc(t("linkInfo", f.ex.name))+'</p>' : '')+
+    '<div class="field"><input id="xq" type="search" autocomplete="off" placeholder="'+t("searchPh")+'" value="'+esc(XQ)+'"></div>'+
+    '<div class="panel" id="xlist">'+pickRows(gid, exId, XQ)+'</div></main>';
+}
+
 /* dolori segnalati di recente su questo esercizio */
 function recentPains(exId){ var from = daysAgo(21); return (S.pains||[]).filter(function(p){ return p.exId===exId && p.date>=from; }).sort(function(a,b){ return b.t-a.t; }); }
 
@@ -1509,6 +1656,7 @@ function route(){
   else if (h[0]==="d") html = vDay(h[1]);
   else if (h[0]==="pain") html = vPain(h[1]);
   else if (h[0]==="adv") html = vAdv(h[1]);
+  else if (h[0]==="x") html = vPick(h[1], h[2]);
   else html = vHome();
   app.innerHTML = html;
 }
@@ -1532,6 +1680,7 @@ function parentOf(h){
   if (p[0]==="p" && p[1]==="e"){ var f2 = findEx(p[2]); return f2 ? "#/p/g/"+f2.g.id : "#/p"; }
   if (p[0]==="p" && p[1]==="g") return "#/p";
   if (p[0]==="d") return "#/c";
+  if (p[0]==="x") return p[2] ? "#/e/"+p[2] : "#/g/"+p[1];
   if (p[0]==="pain") return p[1] && findEx(p[1]) ? "#/e/"+p[1] : "#/";
   /* i consigli si aprono da più posti (esercizio, segnalazioni, calendario): si torna da dove si è venuti */
   if (p[0]==="adv"){ var pv = STACK[STACK.length-2]; return pv && pv!==h ? pv : "#/pain"; }
@@ -1619,7 +1768,14 @@ app.addEventListener("click", function(e){
   else if (act==="newGroup"){ var n = prompt(t("promptGroup")); if (n && n.trim()){ var g={id:uid(),name:n.trim(),color:COLORS[S.groups.length%COLORS.length],exercises:[]}; S.groups.push(g); save(); location.hash="#/g/"+g.id; } }
   else if (act==="renGroup"){ var g1=findGroup(id), n1=prompt(t("newName"), g1.name); if (n1 && n1.trim()){ g1.name=n1.trim(); save(); rerender(true);} }
   else if (act==="delGroup"){ var g2=findGroup(id); if (confirm(t("confDelGroup", g2.name))){ var ids={}; g2.exercises.forEach(function(x){ids[x.id]=1;}); S.logs=S.logs.filter(function(l){return !ids[l.exId];}); S.groups=S.groups.filter(function(x){return x!==g2;}); save(); goBack("#/"); } }
-  else if (act==="newEx"){ var n2 = prompt(t("promptEx")); if (n2 && n2.trim()){ var ex={id:uid(),name:n2.trim()}; findGroup(id).exercises.push(ex); save(); location.hash="#/e/"+ex.id; } }
+  else if (act==="newEx"){ XQ = ""; location.hash = "#/x/"+id; }
+  else if (act==="pick"){ var xh = curHash().split("/"), xg = findGroup(xh[2]), xe = xh[3] && findEx(xh[3]), lid = b.getAttribute("data-v");
+    if (xe){ xe.ex.lib = lid; save(); goBack("#/e/"+xe.ex.id); return; }
+    var dup = lid && xg.exercises.filter(function(e){ return e.lib===lid; })[0];
+    if (dup){ go("#/e/"+dup.id, true); return; }
+    var nm = lid ? libName(LIBM[lid]) : XQ.trim(); if (!nm) return;
+    var nx = {id:uid(), name:nm}; var al = lid || autoLib(nm); if (al) nx.lib = al;
+    xg.exercises.push(nx); save(); go("#/e/"+nx.id, true); }
   else if (act==="renEx"){ var f=findEx(id), n3=prompt(t("newName"), f.ex.name); if (n3 && n3.trim()){ f.ex.name=n3.trim(); save(); rerender(true);} }
   else if (act==="delEx"){ var f2=findEx(id); if (confirm(t("confDelEx", f2.ex.name))){ S.logs=S.logs.filter(function(l){return l.exId!==id;}); f2.g.exercises=f2.g.exercises.filter(function(x){return x.id!==id;}); save(); goBack("#/g/"+f2.g.id); } }
   else if (act==="doImport"){ var p=parseNote(noteText); if (!p.length) return; snapshot("before"); applyImport(S, p, noteDate); save(); noteText=""; toast(t("imported")); goBack("#/"); }
@@ -1632,6 +1788,7 @@ app.addEventListener("click", function(e){
 });
 app.addEventListener("input", function(e){
   if (e.target.id==="note"){ noteText = e.target.value; refreshPreview(); }
+  else if (e.target.id==="xq"){ XQ = e.target.value; var xh = curHash().split("/"), xl = document.getElementById("xlist"); if (xl) xl.innerHTML = pickRows(xh[2], xh[3], XQ); }
   else if (e.target.id==="ndate"){ noteDate = e.target.value || today(); refreshPreview(); }
 });
 app.addEventListener("change", function(e){
