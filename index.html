@@ -212,6 +212,10 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .opt{display:flex;flex-direction:column;gap:8px}
 .opt .seg button{min-height:48px;font-size:15px}
 .opt .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* promemoria backup */
+.bkcard{background:#FFD23F;color:#111;border:var(--bw) solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.bkcard p{margin:0;font-size:14px;font-weight:600}
+.bkcard .btn-plain{background:#fff;color:#111}
 /* consigli su come impostarsi */
 .tips{background:var(--surface);border:var(--bw) solid var(--line);border-radius:12px;box-shadow:var(--sh)}
 .tips summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:14px;cursor:pointer}
@@ -344,7 +348,11 @@ en: {
   notUnd1:"{0} line not understood: ", notUndN:"{0} lines not understood: ", noLines:"No lines in the format “Exercise - 10kg - 8”.",
   saveWorkout:"Save workout · {0}", fromNotes:"From your notes", pasteImport:"Paste &amp; import", pasteNotes:"Paste your notes!",
   writeAsUsual:"Write as usual: group name in capitals, then one line per exercise.", notePh:"SHOULDERS&#10;Military press - 9kg - 7&#10;Cable - 4kg - 16 barely",
-  date:"Date", backup:"Backup", backupInfo:"Your data lives only on this device. Export a backup now and then.", exportB:"Export backup", restoreB:"Restore backup", resetB:"Delete everything",
+  date:"Date", backup:"Backup", backupInfo:"Every day the app saves a full copy of all your history on this phone. Now and then save one outside too (iCloud, Drive, email): if you lose or change phone, that's the one you'll need.", exportB:"Save backup",
+  autoCopies:"Automatic copies", copyDaily:"Start of the day", copyBefore:"Before a change", restoreCopy:"Restore",
+  confRestoreCopy:"Restore the copy of {0}? Your current data is saved as a copy first.", lastOut:"Last backup saved outside the phone: {0}", lastOutNever:"You haven't saved a backup outside the phone yet.",
+  bkTitle:"Save a backup", bkDue:"Your last backup outside the phone was {0}. Save one now: it has all your history.", bkFirst:"Save a full backup outside the phone (iCloud, Drive, email): it has all your history.",
+  bkNow:"Save now", bkLater:"Later", bkSaved:"Backup ready", nSets:"{0} sets", restoreB:"Restore backup", resetB:"Delete everything",
   theme:"Theme", light:"Light", dark:"Dark", language:"Language",
   addRep:"Add at least one rep", allSetsDone:"All {0} sets done!", setSaved:"Set {0}/{1} saved", restStarted:" · rest started", confDelSet:"Delete this set?",
   promptGroup:"Group name (e.g. Back)", newName:"New name", confDelGroup:"Delete “{0}” and all its history?", promptEx:"Exercise name",
@@ -402,7 +410,11 @@ it: {
   notUnd1:"{0} riga non capita: ", notUndN:"{0} righe non capite: ", noLines:"Nessuna riga nel formato “Esercizio - 10kg - 8”.",
   saveWorkout:"Salva allenamento · {0}", fromNotes:"Dalle tue note", pasteImport:"Incolla e importa", pasteNotes:"Incolla le note!",
   writeAsUsual:"Scrivi come sempre: nome del gruppo in maiuscolo, poi una riga per esercizio.", notePh:"SPALLE&#10;Military press - 9kg - 7&#10;Cavo - 4kg - 16 scarse",
-  date:"Data", backup:"Backup", backupInfo:"I tuoi dati sono solo su questo dispositivo. Esporta un backup ogni tanto.", exportB:"Esporta backup", restoreB:"Ripristina backup", resetB:"Elimina tutto",
+  date:"Data", backup:"Backup", backupInfo:"Ogni giorno l'app salva da sola una copia completa di tutto lo storico nel telefono. Ogni tanto salvane una anche fuori (iCloud, Drive, email): se perdi o cambi telefono ti serve quella.", exportB:"Salva backup",
+  autoCopies:"Copie automatiche", copyDaily:"Inizio giornata", copyBefore:"Prima di una modifica", restoreCopy:"Ripristina",
+  confRestoreCopy:"Ripristinare la copia del {0}? Prima i dati attuali vengono salvati come copia.", lastOut:"Ultimo backup salvato fuori dal telefono: {0}", lastOutNever:"Non hai ancora salvato un backup fuori dal telefono.",
+  bkTitle:"Salva un backup", bkDue:"L'ultimo backup fuori dal telefono è di {0}. Salvane uno ora: contiene tutto lo storico.", bkFirst:"Salva un backup completo fuori dal telefono (iCloud, Drive, email): contiene tutto lo storico.",
+  bkNow:"Salva ora", bkLater:"Più tardi", bkSaved:"Backup pronto", nSets:"{0} serie", restoreB:"Ripristina backup", resetB:"Elimina tutto",
   theme:"Tema", light:"Chiaro", dark:"Scuro", language:"Lingua",
   addRep:"Aggiungi almeno una ripetizione", allSetsDone:"Tutte le {0} serie fatte!", setSaved:"Serie {0}/{1} salvata", restStarted:" · recupero partito", confDelSet:"Eliminare questa serie?",
   promptGroup:"Nome del gruppo (es. Schiena)", newName:"Nuovo nome", confDelGroup:"Eliminare “{0}” e tutto il suo storico?", promptEx:"Nome dell'esercizio",
@@ -742,6 +754,40 @@ function load(){
 var S;
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ toast(t("cantSave")); } }
 
+/* ---------- backup ---------- */
+/* copie automatiche nel telefono: ognuna contiene TUTTI i dati. Una a inizio giornata (stato prima delle modifiche
+   del giorno) e una prima di import, ripristino o cancellazione. Si tengono le più recenti. */
+var SNAPK = "ghisa-snaps", MAXSNAP = 12;
+function snaps(){ try { return JSON.parse(localStorage.getItem(SNAPK)) || []; } catch(e){ return []; } }
+function snapshot(kind){
+  if (!S || !S.logs.length) return;
+  var list = snaps(), d = today();
+  if (kind==="day" && list.some(function(x){ return x.kind==="day" && x.date===d; })) return;
+  list.unshift({ date:d, t:Date.now(), kind:kind, sets:S.logs.length, data:JSON.stringify(S) });
+  list = list.slice(0, MAXSNAP);
+  /* se lo spazio non basta si scartano le copie più vecchie */
+  while (list.length){ try { localStorage.setItem(SNAPK, JSON.stringify(list)); return; } catch(e){ list.pop(); } }
+}
+/* file completo da salvare fuori dal telefono: menu Condividi se c'è (iPhone, Android), altrimenti download */
+function lastExport(){ try { return localStorage.getItem("ghisa-lastexport"); } catch(e){ return null; } }
+function markExported(){ try { localStorage.setItem("ghisa-lastexport", today()); localStorage.removeItem("ghisa-bksnooze"); } catch(e){} }
+function exportBackup(){
+  var json = JSON.stringify(S, null, 1), name = "ghisa-backup-"+today()+".json", file = null;
+  try { file = new File([json], name, {type:"application/json"}); } catch(e){}
+  if (file && navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file], title:name}).then(function(){ markExported(); toast(t("bkSaved")); rerender(true); }).catch(function(){});
+    return;
+  }
+  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([json],{type:"application/json"})); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); markExported(); rerender(true);
+}
+/* promemoria in home: ogni 7 giorni, rimandabile di 2 */
+function backupDue(){
+  if (!S.logs.length) return false;
+  try { var sn = localStorage.getItem("ghisa-bksnooze"); if (sn && sn>=today()) return false; } catch(e){}
+  var le = lastExport(); return !le || le<=daysAgo(7);
+}
+
 function findEx(id){
   for (var i=0;i<S.groups.length;i++){ var g=S.groups[i]; for (var j=0;j<g.exercises.length;j++) if (g.exercises[j].id===id) return {g:g, ex:g.exercises[j]}; }
   return null;
@@ -966,10 +1012,18 @@ function vHome(){
   var trainedToday = last===today();
   return '<main><div class="row between" style="align-items:flex-end"><div class="brand"><h1>Ghisa</h1><span class="label">'+t("gymLog")+'</span>'+
     '<span class="row" style="margin-top:12px;gap:12px"><span class="chip">'+I.flame+t("thisWeek", nWeek)+'</span><a class="iconbtn" href="#/s" aria-label="'+t("settings")+'">'+I.gear+'</a></span></div>'+
-    bellSay(trainedToday?"flex":"hi", 104, trainedToday?t("niceWork"):GREET, "home")+'</div>'+hero+
+    bellSay(trainedToday?"flex":"hi", 104, trainedToday?t("niceWork"):GREET, "home")+'</div>'+hero+backupCard()+
     '<div class="row between" style="align-items:baseline;margin-top:4px"><h2 class="title-m">'+t("yourGroups")+'</h2><span class="mono muted" style="font-size:12px">'+tn(nEx,"ex1","exN")+'</span></div>'+
     '<div class="grid2">'+cards+'<button class="btn btn-dash gnew" data-act="newGroup">'+I.plus+t("newGroup")+'</button></div>'+
     '<a class="btn btn-plain" href="#/pain">'+I.zap+t("reportPain")+'</a></main>'+navBar("home");
+}
+
+function backupCard(){
+  if (!backupDue()) return "";
+  var le = lastExport();
+  return '<section class="bkcard"><div class="row" style="gap:8px">'+I.down+'<h2 class="title-m">'+t("bkTitle")+'</h2></div>'+
+    '<p>'+esc(le ? t("bkDue", rel(le)) : t("bkFirst"))+'</p>'+
+    '<div class="links"><button class="btn btn-accent" data-act="export">'+t("bkNow")+'</button><button class="btn btn-plain" data-act="bklater">'+t("bkLater")+'</button></div></section>';
 }
 
 function vGroup(id){
@@ -1293,10 +1347,21 @@ function vNote(){
     '<textarea id="note" placeholder="'+t("notePh")+'">'+esc(noteText)+'</textarea>'+
     '<div class="field"><label for="ndate" class="label" style="color:var(--muted)">'+t("date")+'</label><input id="ndate" type="date" value="'+noteDate+'"></div>'+
     '<div id="preview" style="display:flex;flex-direction:column;gap:14px">'+prev+'</div>'+
-    '<div style="margin-top:12px"><h2 class="title-m">'+t("backup")+'</h2><p class="muted" style="margin:6px 0 10px;font-size:14px">'+t("backupInfo")+'</p>'+
+    '<div style="margin-top:12px"><h2 class="title-m">'+t("backup")+'</h2><p class="muted" style="margin:6px 0 6px;font-size:14px">'+t("backupInfo")+'</p>'+
+    '<p class="mono" style="margin:0 0 10px;font-size:12.5px;font-weight:700">'+esc(lastExport() ? t("lastOut", rel(lastExport())) : t("lastOutNever"))+'</p>'+
     '<div class="links"><button class="btn btn-plain" data-act="export">'+t("exportB")+'</button><button class="btn btn-plain" data-act="restore">'+t("restoreB")+'</button></div>'+
+    snapList()+
     '<div class="links" style="margin-top:8px"><button class="btn btn-plain" data-act="reset">'+t("resetB")+'</button></div>'+
     '<input type="file" id="file" accept="application/json,.json" hidden></div></main>'+navBar("note");
+}
+
+function snapList(){
+  var list = snaps(); if (!list.length) return "";
+  return '<div class="panel" style="margin-top:12px"><div class="phead">'+t("autoCopies")+'</div>'+list.map(function(x){
+    var hm = new Date(x.t).toTimeString().slice(0,5);
+    return '<div class="prow"><span class="grow"><b style="display:block">'+esc(dayLabel(x.date))+' · '+hm+'</b><span class="mono muted" style="font-size:12px">'+(x.kind==="day"?t("copyDaily"):t("copyBefore"))+' · '+t("nSets", x.sets)+'</span></span>'+
+      '<button class="btn btn-plain" style="width:auto;min-height:36px;font-size:12px;padding:4px 10px" data-act="snapRestore" data-id="'+x.t+'">'+t("restoreCopy")+'</button></div>';
+  }).join("")+'</div>';
 }
 
 /* ---------- calendario degli allenamenti passati ---------- */
@@ -1537,10 +1602,13 @@ app.addEventListener("click", function(e){
   else if (act==="newEx"){ var n2 = prompt(t("promptEx")); if (n2 && n2.trim()){ var ex={id:uid(),name:n2.trim()}; findGroup(id).exercises.push(ex); save(); location.hash="#/e/"+ex.id; } }
   else if (act==="renEx"){ var f=findEx(id), n3=prompt(t("newName"), f.ex.name); if (n3 && n3.trim()){ f.ex.name=n3.trim(); save(); rerender(true);} }
   else if (act==="delEx"){ var f2=findEx(id); if (confirm(t("confDelEx", f2.ex.name))){ S.logs=S.logs.filter(function(l){return l.exId!==id;}); f2.g.exercises=f2.g.exercises.filter(function(x){return x.id!==id;}); save(); goBack("#/g/"+f2.g.id); } }
-  else if (act==="doImport"){ var p=parseNote(noteText); if (!p.length) return; applyImport(S, p, noteDate); save(); noteText=""; toast(t("imported")); goBack("#/"); }
-  else if (act==="export"){ var blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}); var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="ghisa-backup-"+today()+".json"; document.body.appendChild(a); a.click(); a.remove(); }
+  else if (act==="doImport"){ var p=parseNote(noteText); if (!p.length) return; snapshot("before"); applyImport(S, p, noteDate); save(); noteText=""; toast(t("imported")); goBack("#/"); }
+  else if (act==="export"){ exportBackup(); }
+  else if (act==="bklater"){ try { localStorage.setItem("ghisa-bksnooze", daysAgo(-2)); } catch(err){} rerender(true); }
+  else if (act==="snapRestore"){ var sx = snaps().filter(function(x){ return String(x.t)===id; })[0];
+    if (sx && confirm(t("confRestoreCopy", dayLabel(sx.date)))){ snapshot("before"); S = JSON.parse(sx.data); if (!S.pains) S.pains=[]; save(); toast(t("restored")); go("#/", true); route(); } }
   else if (act==="restore"){ document.getElementById("file").click(); }
-  else if (act==="reset"){ if (confirm(t("confReset"))){ S=empty(); save(); go("#/", true); route(); } }
+  else if (act==="reset"){ if (confirm(t("confReset"))){ snapshot("before"); S=empty(); save(); go("#/", true); route(); } }
 });
 app.addEventListener("input", function(e){
   if (e.target.id==="note"){ noteText = e.target.value; refreshPreview(); }
@@ -1552,7 +1620,7 @@ app.addEventListener("change", function(e){
   if (e.target.id==="pred") PF.red = e.target.checked;
   if (e.target.id==="file" && e.target.files[0]){
     var r = new FileReader();
-    r.onload = function(){ try { var s = JSON.parse(r.result); if (!s.groups || !s.logs) throw 0; if (confirm(t("confRestore"))){ S=s; if (!S.pains) S.pains=[]; save(); toast(t("restored")); go("#/", true); route(); } } catch(err){ toast(t("badBackup")); } };
+    r.onload = function(){ try { var s = JSON.parse(r.result); if (!s.groups || !s.logs) throw 0; if (confirm(t("confRestore"))){ snapshot("before"); S=s; if (!S.pains) S.pains=[]; save(); toast(t("restored")); go("#/", true); route(); } } catch(err){ toast(t("badBackup")); } };
     r.readAsText(e.target.files[0]);
   }
 });
@@ -1565,6 +1633,9 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { windo
 applyTheme(curTheme());
 S = load();
 if (!S.pains) S.pains = [];
+snapshot("day");
+/* chiede al browser di non cancellare i dati dell'app quando serve spazio */
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
 if (S.seed !== 2){ applyImport(S, parseNote(SEED2), "2026-10-19"); S.seed = 2; }
 save();
 route();
