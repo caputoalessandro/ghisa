@@ -212,6 +212,10 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .opt{display:flex;flex-direction:column;gap:8px}
 .opt .seg button{min-height:48px;font-size:15px}
 .opt .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* Dropbox */
+.dbx{margin-top:12px;background:var(--surface);border:var(--bw) solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.dbx svg{color:#0061FE}
+.dbxerr{margin:0;font-size:13px;font-weight:700;color:var(--bad)}
 /* registrazione in un giorno passato */
 .pastbar{display:flex;align-items:center;gap:10px;background:#FFD23F;color:#111;border:var(--bw) solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:8px 10px 8px 12px;font-weight:800;font-size:14px}
 .pastbar .btn{width:auto;min-height:36px;font-size:12px;padding:4px 10px;flex:none;background:#fff;color:#111}
@@ -328,6 +332,7 @@ var I = {
   zap:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
   bulb:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>',
   next:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
+  cloud:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19.5 10 4 4 0 0 1 18 18z"/></svg>',
   down:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>'
 };
 
@@ -380,6 +385,13 @@ en: {
   confRestore:"Replace your current data with this backup?", restored:"Backup restored", badBackup:"Not a valid backup file",
   history:"Workout history", prevMonth:"Previous month", nextMonth:"Next month", monthW1:"{0} workout this month", monthWN:"{0} workouts this month",
   noWorkMonth:"No workouts this month.", set1:"{0} set", setN:"{0} sets", dayEmpty:"No workouts on this day.", lgPain:"pain", calQuiet:"Rest days count too!", calBusy:"Look at you go!",
+  dbxInfo:"Connect Dropbox and the app saves a full backup there by itself every time you log something.", dbxConnect:"Connect Dropbox",
+  dbxPasteInfo:"In the Dropbox page tap Allow, copy the code it shows, come back here and paste it below.", dbxCodePh:"Paste the code here", dbxConfirm:"Confirm",
+  dbxDone:"Dropbox connected", dbxBadCode:"That didn't work: try connecting again", dbxOn:"Connected as {0}. The backup is saved automatically after every change.",
+  dbxLast:"Last saved to Dropbox: {0}", dbxNever:"Not saved to Dropbox yet", dbxErr:"The last save to Dropbox didn't work. It will retry when you're online; or tap Save now.",
+  dbxNow:"Save now", dbxSaved:"Saved to Dropbox", dbxRestore:"Restore from Dropbox", dbxNoFile:"No backup found on Dropbox", dbxOff:"Disconnect Dropbox",
+  dbxOffQ:"Disconnect Dropbox? The backups already there stay in your Dropbox.", dbxRevoked:"Dropbox access was removed. Connect it again to keep saving backups.",
+  dbxWait:"One moment, then tap again", justNow:"just now", minAgo:"{0} min ago",
   logFor:"Logging for {0}", backToday:"Back to today", dayL:"Day", daySets:"{0} of {1} sets", setsOf:"Sets of {0}", addToDay:"Add sets to this day", chooseEx:"Choose the exercise",
   howSetup:"How to set up", searchPh:"Search or type a name", useCustom:"Add “{0}” as a new exercise", suggested:"Suggested for {0}", allEx:"All exercises",
   noMatch:"Nothing in the list: you can add it with your own name.", inGroup:"already here", linkTitle:"Pick from the list", linkInfo:"Choose the exercise that matches “{0}”: the name stays the same, the tips get more precise.",
@@ -445,6 +457,13 @@ it: {
   confRestore:"Sostituire i dati attuali con questo backup?", restored:"Backup ripristinato", badBackup:"Non è un file di backup valido",
   history:"Storico allenamenti", prevMonth:"Mese precedente", nextMonth:"Mese successivo", monthW1:"{0} allenamento questo mese", monthWN:"{0} allenamenti questo mese",
   noWorkMonth:"Nessun allenamento questo mese.", set1:"{0} serie", setN:"{0} serie", dayEmpty:"Nessun allenamento in questo giorno.", lgPain:"dolore", calQuiet:"Anche il riposo conta!", calBusy:"Che costanza!",
+  dbxInfo:"Collega Dropbox e l'app ci salverà da sola un backup completo ogni volta che registri qualcosa.", dbxConnect:"Collega Dropbox",
+  dbxPasteInfo:"Nella pagina di Dropbox tocca Consenti, copia il codice che compare, torna qui e incollalo qui sotto.", dbxCodePh:"Incolla qui il codice", dbxConfirm:"Conferma",
+  dbxDone:"Dropbox collegato", dbxBadCode:"Non ha funzionato: riprova a collegare", dbxOn:"Collegato come {0}. Il backup si salva da solo dopo ogni modifica.",
+  dbxLast:"Ultimo salvataggio su Dropbox: {0}", dbxNever:"Non ancora salvato su Dropbox", dbxErr:"L'ultimo salvataggio su Dropbox non è riuscito. Riproverà quando sei online, oppure tocca Salva ora.",
+  dbxNow:"Salva ora", dbxSaved:"Salvato su Dropbox", dbxRestore:"Ripristina da Dropbox", dbxNoFile:"Nessun backup trovato su Dropbox", dbxOff:"Scollega Dropbox",
+  dbxOffQ:"Scollegare Dropbox? I backup già salvati restano nel tuo Dropbox.", dbxRevoked:"L'accesso a Dropbox è stato tolto. Ricollegalo per continuare a salvare i backup.",
+  dbxWait:"Un attimo, poi tocca di nuovo", justNow:"adesso", minAgo:"{0} min fa",
   logFor:"Stai registrando per {0}", backToday:"Torna a oggi", dayL:"Giorno", daySets:"{0} di {1} serie", setsOf:"Serie di {0}", addToDay:"Aggiungi serie a questo giorno", chooseEx:"Scegli l'esercizio",
   howSetup:"Come impostarti", searchPh:"Cerca o scrivi un nome", useCustom:"Aggiungi “{0}” come nuovo esercizio", suggested:"Consigliati per {0}", allEx:"Tutti gli esercizi",
   noMatch:"Non c'è nella lista: puoi aggiungerlo col tuo nome.", inGroup:"già qui", linkTitle:"Scegli dalla lista", linkInfo:"Scegli l'esercizio che corrisponde a “{0}”: il nome resta lo stesso, i consigli diventano più precisi.",
@@ -884,7 +903,7 @@ function load(){
   var s2 = empty(); applyImport(s2, parseNote(SEED), "2026-10-13"); applyImport(s2, parseNote(SEED2), "2026-10-19"); s2.seed = 2; return s2;
 }
 var S;
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ toast(t("cantSave")); } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){ toast(t("cantSave")); } dbxSoon(); }
 
 /* ---------- backup ---------- */
 /* copie automatiche nel telefono: ognuna contiene TUTTI i dati. Una a inizio giornata (stato prima delle modifiche
@@ -913,6 +932,119 @@ function exportBackup(){
   var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([json],{type:"application/json"})); a.download = name;
   document.body.appendChild(a); a.click(); a.remove(); markExported(); rerender(true);
 }
+/* ---------- Dropbox: backup automatico nel cloud ---------- */
+/* App key dell'app Dropbox (pubblica, non è un segreto). Vuota = funzione nascosta. */
+var DBX_KEY = "";
+var DBX_FILE = "/ghisa-backup.json";
+/* accesso con PKCE: niente server, l'app tiene un refresh token e rinnova da sola l'accesso */
+function dbx(){ try { return JSON.parse(localStorage.getItem("ghisa-dbx")) || null; } catch(e){ return null; } }
+function dbxSet(o){ try { if (o) localStorage.setItem("ghisa-dbx", JSON.stringify(o)); else localStorage.removeItem("ghisa-dbx"); } catch(e){} }
+function dbxOn(){ var d = dbx(); return !!(d && d.refresh); }
+function b64url(buf){ var s = "", b = new Uint8Array(buf); for (var i=0;i<b.length;i++) s += String.fromCharCode(b[i]); return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function randStr(n){ var a = new Uint8Array(n); crypto.getRandomValues(a); return b64url(a).slice(0,n); }
+/* app installata sulla schermata Home: lì il ritorno da Dropbox non rientra nell'app, quindi si incolla il codice */
+function standalone(){ return window.navigator.standalone===true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches); }
+function dbxRedirect(){ return location.origin+location.pathname; }
+var DBX_PASTE = false, DBX_PK = null;
+/* il codice di verifica si prepara prima del tocco: Safari blocca le finestre aperte dopo un'attesa */
+function dbxPrep(){
+  if (DBX_PK || !window.crypto || !crypto.subtle) return;
+  var v = randStr(64);
+  crypto.subtle.digest("SHA-256", new TextEncoder().encode(v)).then(function(h){ DBX_PK = {v:v, c:b64url(h)}; });
+}
+function dbxConnect(){
+  if (!DBX_PK){ dbxPrep(); toast(t("dbxWait")); return; }
+  var state = randStr(16), paste = standalone();
+  try { localStorage.setItem("ghisa-dbx-pkce", JSON.stringify({v:DBX_PK.v, s:state, paste:paste})); } catch(e){}
+  var url = "https://www.dropbox.com/oauth2/authorize?client_id="+encodeURIComponent(DBX_KEY)+"&response_type=code&code_challenge="+DBX_PK.c+
+    "&code_challenge_method=S256&token_access_type=offline&scope="+encodeURIComponent("files.content.write files.content.read account_info.read")+
+    "&state="+state+(paste ? "" : "&redirect_uri="+encodeURIComponent(dbxRedirect()));
+  if (paste){ window.open(url, "_blank"); DBX_PASTE = true; rerender(true); } else location.href = url;
+}
+function dbxForm(o){ return Object.keys(o).map(function(k){ return encodeURIComponent(k)+"="+encodeURIComponent(o[k]); }).join("&"); }
+function dbxToken(params){
+  return fetch("https://api.dropboxapi.com/oauth2/token", { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:dbxForm(params) })
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok) throw j; return j; }); });
+}
+function dbxFinish(code){
+  var pk; try { pk = JSON.parse(localStorage.getItem("ghisa-dbx-pkce")); } catch(e){}
+  if (!pk || !code) return Promise.reject();
+  var params = { code:code.trim(), grant_type:"authorization_code", code_verifier:pk.v, client_id:DBX_KEY };
+  if (!pk.paste) params.redirect_uri = dbxRedirect();
+  return dbxToken(params).then(function(j){
+    try { localStorage.removeItem("ghisa-dbx-pkce"); } catch(e){}
+    dbxSet({ refresh:j.refresh_token, access:j.access_token, exp:Date.now()+(j.expires_in-60)*1000, last:null, err:null, email:null });
+    DBX_PASTE = false;
+    return dbxCall("https://api.dropboxapi.com/2/users/get_current_account", null).then(function(r){ return r.json(); })
+      .then(function(a){ var d = dbx(); d.email = a.email; dbxSet(d); }).catch(function(){})
+      .then(function(){ return dbxSync(true); });
+  });
+}
+/* access token valido (rinnovato col refresh token quando scade) */
+function dbxAccess(){
+  var d = dbx(); if (!d || !d.refresh) return Promise.reject({error:"off"});
+  if (d.access && d.exp>Date.now()) return Promise.resolve(d.access);
+  return dbxToken({ grant_type:"refresh_token", refresh_token:d.refresh, client_id:DBX_KEY }).then(function(j){
+    var d2 = dbx(); d2.access = j.access_token; d2.exp = Date.now()+(j.expires_in-60)*1000; dbxSet(d2); return j.access_token;
+  }, function(e){
+    /* accesso revocato da Dropbox: si scollega e lo si dice */
+    if (e && e.error==="invalid_grant"){ var d3 = dbx(); if (d3){ d3.refresh = null; d3.err = "revoked"; dbxSet(d3); } }
+    throw e;
+  });
+}
+function dbxCall(url, arg, body){
+  return dbxAccess().then(function(tok){
+    var h = { "Authorization":"Bearer "+tok };
+    if (arg) h["Dropbox-API-Arg"] = JSON.stringify(arg);
+    if (body!=null) h["Content-Type"] = "application/octet-stream";
+    return fetch(url, { method:"POST", headers:h, body: body!=null ? body : (arg ? undefined : null) })
+      .then(function(r){ if (!r.ok) return r.text().then(function(tx){ throw {status:r.status, text:tx}; }); return r; });
+  });
+}
+/* si carica solo se i dati sono cambiati dall'ultimo salvataggio */
+function hashStr(str){ var h = 5381; for (var i=0;i<str.length;i++) h = ((h<<5)+h+str.charCodeAt(i))|0; return str.length+":"+h; }
+var dbxBusy = false, dbxTimer = null;
+function dbxSoon(){ if (!dbxOn()) return; clearTimeout(dbxTimer); dbxTimer = setTimeout(function(){ dbxSync(false); }, 3000); }
+function dbxSync(force){
+  if (!DBX_KEY || !dbxOn() || dbxBusy || !S) return Promise.resolve();
+  var json = JSON.stringify(S, null, 1), hash = hashStr(json), d = dbx();
+  if (!force && d.hash===hash) return Promise.resolve();
+  if (!navigator.onLine){ return Promise.resolve(); }
+  dbxBusy = true;
+  var day = today(), up = function(path){ return dbxCall("https://content.dropboxapi.com/2/files/upload", {path:path, mode:"overwrite", mute:true}, json); };
+  /* il file principale sempre aggiornato, più una copia al giorno nella cartella "giorni" */
+  return up(DBX_FILE).then(function(){ return d.day===day ? null : up("/giorni/ghisa-backup-"+day+".json"); })
+    .then(function(){ var d2 = dbx(); if (d2){ d2.last = Date.now(); d2.hash = hash; d2.day = day; d2.err = null; dbxSet(d2); } markExported(); },
+          function(e){ var d2 = dbx(); if (d2){ d2.err = (e && e.status) ? "http "+e.status : (e && e.error) || "net"; dbxSet(d2); } })
+    .then(function(){ dbxBusy = false; if (curHash()==="#/n") rerender(true); });
+}
+function dbxRestore(){
+  return dbxCall("https://content.dropboxapi.com/2/files/download", {path:DBX_FILE}).then(function(r){ return r.json(); });
+}
+function dbxDisconnect(){
+  var d = dbx();
+  if (d && d.access) fetch("https://api.dropboxapi.com/2/auth/token/revoke", { method:"POST", headers:{"Authorization":"Bearer "+d.access} }).catch(function(){});
+  dbxSet(null); DBX_PASTE = false;
+}
+function dbxHtml(){
+  if (!DBX_KEY) return "";
+  var d = dbx(), on = dbxOn(), body;
+  if (on){
+    var st = d.err ? '<p class="dbxerr">'+esc(t("dbxErr"))+'</p>' : '<p class="mono" style="margin:0;font-size:12.5px;font-weight:700">'+esc(d.last ? t("dbxLast", relTime(d.last)) : t("dbxNever"))+'</p>';
+    body = '<p style="margin:0;font-size:14px">'+esc(t("dbxOn", d.email || "Dropbox"))+'</p>'+st+
+      '<div class="links"><button class="btn btn-accent" data-act="dbxNow">'+t("dbxNow")+'</button><button class="btn btn-plain" data-act="dbxRestore">'+t("dbxRestore")+'</button></div>'+
+      '<button class="btn btn-plain" data-act="dbxOff">'+t("dbxOff")+'</button>';
+  } else {
+    dbxPrep();
+    body = '<p style="margin:0;font-size:14px">'+esc(d && d.err==="revoked" ? t("dbxRevoked") : t("dbxInfo"))+'</p>'+
+      '<button class="btn btn-accent" data-act="dbxConnect">'+t("dbxConnect")+'</button>'+
+      (DBX_PASTE ? '<p style="margin:0;font-size:13.5px">'+esc(t("dbxPasteInfo"))+'</p><div class="field"><input id="dbxcode" autocomplete="off" placeholder="'+t("dbxCodePh")+'"></div>'+
+        '<button class="btn btn-plain" data-act="dbxCode">'+t("dbxConfirm")+'</button>' : '');
+  }
+  return '<section class="dbx"><div class="row" style="gap:8px">'+I.cloud+'<h2 class="title-m">Dropbox</h2></div>'+body+'</section>';
+}
+function relTime(ms){ var m = Math.round((Date.now()-ms)/60000); if (m<1) return t("justNow"); if (m<60) return t("minAgo", m); return rel(iso(new Date(ms)))+" "+new Date(ms).toTimeString().slice(0,5); }
+
 /* promemoria in home: ogni 7 giorni, rimandabile di 2 */
 function backupDue(){
   if (!S.logs.length) return false;
@@ -1530,7 +1662,7 @@ function vNote(){
     '<div style="margin-top:12px"><h2 class="title-m">'+t("backup")+'</h2><p class="muted" style="margin:6px 0 6px;font-size:14px">'+t("backupInfo")+'</p>'+
     '<p class="mono" style="margin:0 0 10px;font-size:12.5px;font-weight:700">'+esc(lastExport() ? t("lastOut", rel(lastExport())) : t("lastOutNever"))+'</p>'+
     '<div class="links"><button class="btn btn-plain" data-act="export">'+t("exportB")+'</button><button class="btn btn-plain" data-act="restore">'+t("restoreB")+'</button></div>'+
-    snapList()+
+    dbxHtml()+snapList()+
     '<div class="links" style="margin-top:8px"><button class="btn btn-plain" data-act="reset">'+t("resetB")+'</button></div>'+
     '<input type="file" id="file" accept="application/json,.json" hidden></div></main>'+navBar("note");
 }
@@ -1775,6 +1907,15 @@ app.addEventListener("click", function(e){
   else if (act==="kg" || act==="reps"){ d = readDraft(); var step = parseFloat(b.getAttribute("data-d"));
     if (act==="kg") d.kg = Math.max(0, Math.round((d.kg+step)*100)/100); else d.reps = Math.max(0, d.reps+step);
     rerender(true); }
+  else if (act==="dbxConnect"){ dbxConnect(); }
+  else if (act==="dbxCode"){ var cv = (document.getElementById("dbxcode")||{}).value; if (!cv || !cv.trim()) return;
+    b.disabled = true; dbxFinish(cv).then(function(){ toast(t("dbxDone")); rerender(true); }, function(){ toast(t("dbxBadCode")); b.disabled = false; }); }
+  else if (act==="dbxNow"){ b.disabled = true; dbxSync(true).then(function(){ var dd = dbx(); toast(dd && !dd.err ? t("dbxSaved") : t("dbxErr")); rerender(true); }); }
+  else if (act==="dbxRestore"){ dbxRestore().then(function(s2){
+      if (!s2 || !s2.groups || !s2.logs) throw 0;
+      if (confirm(t("confRestore"))){ snapshot("before"); S = s2; if (!S.pains) S.pains = []; save(); toast(t("restored")); go("#/", true); route(); } },
+      function(){ toast(t("dbxNoFile")); }).catch(function(){ toast(t("badBackup")); }); }
+  else if (act==="dbxOff"){ if (confirm(t("dbxOffQ"))){ dbxDisconnect(); rerender(true); } }
   else if (act==="backToday"){ LOGDATE = null; rerender(true); }
   else if (act==="addToDay"){ var dd = b.getAttribute("data-v"); LOGDATE = dd===today() ? null : dd; go("#/d/"+dd+"/add"); }
   else if (act==="gcolor"){ findGroup(id).c = b.getAttribute("data-v"); save(); rerender(true); }
@@ -1847,6 +1988,17 @@ try { if (navigator.storage && navigator.storage.persist) navigator.storage.pers
 if (S.seed !== 2){ applyImport(S, parseNote(SEED2), "2026-10-19"); S.seed = 2; }
 save();
 route();
+(function(){
+  var m = location.search.match(/[?&]code=([^&]+)/), st = location.search.match(/[?&]state=([^&]+)/), pk = null;
+  try { pk = JSON.parse(localStorage.getItem("ghisa-dbx-pkce")); } catch(e){}
+  if (m && DBX_KEY && pk && st && st[1]===pk.s){
+    history.replaceState(null, "", location.pathname+"#/n");
+    dbxFinish(decodeURIComponent(m[1])).then(function(){ toast(t("dbxDone")); route(); }, function(){ toast(t("dbxBadCode")); route(); });
+  } else if (m || /[?&]error=/.test(location.search)) history.replaceState(null, "", location.pathname+location.hash);
+  else dbxSync(false);
+})();
+window.addEventListener("online", function(){ dbxSync(false); });
+document.addEventListener("visibilitychange", function(){ if (document.hidden && dbxTimer){ clearTimeout(dbxTimer); dbxSync(false); } });
 })();
 </script>
 </body>
