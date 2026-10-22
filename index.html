@@ -212,6 +212,10 @@ nav a[aria-current="page"]{background:var(--nav-on);color:var(--nav-on-ink);bord
 .opt{display:flex;flex-direction:column;gap:8px}
 .opt .seg button{min-height:48px;font-size:15px}
 .opt .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* registrazione in un giorno passato */
+.pastbar{display:flex;align-items:center;gap:10px;background:#FFD23F;color:#111;border:var(--bw) solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:8px 10px 8px 12px;font-weight:800;font-size:14px}
+.pastbar .btn{width:auto;min-height:36px;font-size:12px;padding:4px 10px;flex:none;background:#fff;color:#111}
+.field input[type=date]{font-family:var(--f-mono);font-weight:700;font-size:15px;flex:1;min-width:0;border:0;background:transparent}
 /* lista esercizi */
 button.prow.pick{width:100%;border:0;border-bottom:2px solid var(--line);background:transparent;text-align:left;color:var(--text);min-height:52px;cursor:pointer}
 button.prow.pick:last-child{border-bottom:0}
@@ -376,6 +380,7 @@ en: {
   confRestore:"Replace your current data with this backup?", restored:"Backup restored", badBackup:"Not a valid backup file",
   history:"Workout history", prevMonth:"Previous month", nextMonth:"Next month", monthW1:"{0} workout this month", monthWN:"{0} workouts this month",
   noWorkMonth:"No workouts this month.", set1:"{0} set", setN:"{0} sets", dayEmpty:"No workouts on this day.", lgPain:"pain", calQuiet:"Rest days count too!", calBusy:"Look at you go!",
+  logFor:"Logging for {0}", backToday:"Back to today", dayL:"Day", daySets:"{0} of {1} sets", setsOf:"Sets of {0}", addToDay:"Add sets to this day", chooseEx:"Choose the exercise",
   howSetup:"How to set up", searchPh:"Search or type a name", useCustom:"Add “{0}” as a new exercise", suggested:"Suggested for {0}", allEx:"All exercises",
   noMatch:"Nothing in the list: you can add it with your own name.", inGroup:"already here", linkTitle:"Pick from the list", linkInfo:"Choose the exercise that matches “{0}”: the name stays the same, the tips get more precise.",
   tipsFor:"Tips for: {0}", notRecog:"Exercise not recognized: these are general tips.", pickFromList:"Pick from the list", changeLink:"Change", forToday:"For today", wrTitle:"Weight & reps",
@@ -440,6 +445,7 @@ it: {
   confRestore:"Sostituire i dati attuali con questo backup?", restored:"Backup ripristinato", badBackup:"Non è un file di backup valido",
   history:"Storico allenamenti", prevMonth:"Mese precedente", nextMonth:"Mese successivo", monthW1:"{0} allenamento questo mese", monthWN:"{0} allenamenti questo mese",
   noWorkMonth:"Nessun allenamento questo mese.", set1:"{0} serie", setN:"{0} serie", dayEmpty:"Nessun allenamento in questo giorno.", lgPain:"dolore", calQuiet:"Anche il riposo conta!", calBusy:"Che costanza!",
+  logFor:"Stai registrando per {0}", backToday:"Torna a oggi", dayL:"Giorno", daySets:"{0} di {1} serie", setsOf:"Serie di {0}", addToDay:"Aggiungi serie a questo giorno", chooseEx:"Scegli l'esercizio",
   howSetup:"Come impostarti", searchPh:"Cerca o scrivi un nome", useCustom:"Aggiungi “{0}” come nuovo esercizio", suggested:"Consigliati per {0}", allEx:"Tutti gli esercizi",
   noMatch:"Non c'è nella lista: puoi aggiungerlo col tuo nome.", inGroup:"già qui", linkTitle:"Scegli dalla lista", linkInfo:"Scegli l'esercizio che corrisponde a “{0}”: il nome resta lo stesso, i consigli diventano più precisi.",
   tipsFor:"Consigli per: {0}", notRecog:"Esercizio non riconosciuto: questi sono consigli generali.", pickFromList:"Scegli dalla lista", changeLink:"Cambia", forToday:"Per oggi", wrTitle:"Peso e ripetizioni",
@@ -1116,7 +1122,16 @@ function navBar(cur){
 }
 function topBack(href, right){ return '<div class="row between"><a class="iconbtn" data-back href="'+href+'" aria-label="'+t("back")+'">'+I.back+'</a>'+(right||"")+'</div>'; }
 
+/* giorno su cui si registrano le serie: oggi, oppure un giorno passato scelto dall'esercizio o dal calendario */
+var LOGDATE = null;
+function logDay(){ return LOGDATE || today(); }
+function pastBanner(){
+  if (!LOGDATE) return "";
+  return '<div class="pastbar">'+I.cal+'<span class="grow">'+esc(t("logFor", longDay(LOGDATE)))+'</span><button class="btn btn-plain" data-act="backToday">'+t("backToday")+'</button></div>';
+}
+
 function vHome(){
+  LOGDATE = null;
   var week = {}; S.logs.forEach(function(l){ if (l.date>=daysAgo(6)) week[l.date]=1; });
   var nWeek = Object.keys(week).length;
   var last = null; S.logs.forEach(function(l){ if (!last || l.date>last) last=l.date; });
@@ -1161,13 +1176,13 @@ function backupCard(){
 
 function vGroup(id){
   var g = findGroup(id); if (!g) return vHome();
-  var td = today(), done = 0, n = g.exercises.length;
+  var td = logDay(), done = 0, n = g.exercises.length;
   var rows = g.exercises.map(function(ex){
     var ls = logsOf(ex.id), todays = ls.filter(function(l){return l.date===td;});
     var goal = setsGoal(ex), isDone = todays.length>=goal; if (isDone) done++;
     var ref = isDone ? todays[todays.length-1] : ls[ls.length-1];
     var sub;
-    if (todays.length) sub = t("todaySets", todays.length, goal);
+    if (todays.length) sub = LOGDATE ? t("daySets", todays.length, goal) : t("todaySets", todays.length, goal);
     else if (ref) sub = t("lastTime", rel(ref.date))+(ref.scarse?" · "+t("barely"):"");
     else sub = t("noSetsYet", goal);
     return '<a class="erow'+(isDone?" done":todays.length?" part":"")+'" href="#/e/'+ex.id+'"><span class="tick">'+(isDone?I.check:todays.length?todays.length+"/"+goal:"")+'</span>'+
@@ -1175,8 +1190,8 @@ function vGroup(id){
       (ref?'<span class="eval"><b>'+fmtNum(ref.kg)+' kg</b><span>× '+ref.reps+' reps</span></span>':'')+'</a>';
   }).join("");
   var pct = n? Math.round(done/n*100):0;
-  return '<main>'+topBack("#/",'<span class="dot" style="width:18px;height:18px;background:'+gColor(g)+'"></span>')+
-    '<div style="display:flex;flex-direction:column;gap:6px"><div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">'+esc(t("todayDay", longDay(td)))+'</span><h1 class="title-xl">'+esc(g.name)+'</h1></div>'+
+  return '<main>'+topBack("#/",'<span class="dot" style="width:18px;height:18px;background:'+gColor(g)+'"></span>')+pastBanner()+
+    '<div style="display:flex;flex-direction:column;gap:6px"><div class="row between" style="align-items:flex-end"><div class="grow"><span class="label">'+esc(LOGDATE ? longDay(td) : t("todayDay", longDay(td)))+'</span><h1 class="title-xl">'+esc(g.name)+'</h1></div>'+
     (n ? (done===n ? bellSay("flex",70,t("allDone")) : done ? bellSay("go",70,t("toGo", n-done)) : bellSay("hi",70,t("letsGo"))) : "")+'</div>'+
     '<div class="row" style="margin-top:6px"><div class="bar"><i style="width:'+pct+'%;background:'+gColor(g)+'"></i></div><span class="mono" style="font-weight:700;font-size:13px">'+done+'/'+n+'</span></div></div>'+
     '<div class="list">'+(rows||'<div class="empty">'+bellSay("sleep",70,"")+t("noExYet")+'</div>')+'</div>'+
@@ -1189,8 +1204,8 @@ function vGroup(id){
 
 /* consiglio su misura per oggi, guardando l'ultima seduta di questo esercizio */
 function todayHint(ex, ls){
-  var td = today(), prevDay = null;
-  ls.forEach(function(l){ if (l.date!==td) prevDay = l.date; });
+  var td = logDay(), prevDay = null;
+  ls.forEach(function(l){ if (l.date<td) prevDay = l.date; });
   if (!prevDay) return "";
   var day = ls.filter(function(l){ return l.date===prevDay; });
   var top = day.reduce(function(a,l){ return l.kg>a.kg ? l : a; }, day[0]);
@@ -1243,8 +1258,8 @@ function recentPains(exId){ var from = daysAgo(21); return (S.pains||[]).filter(
 
 function vEx(id){
   var f = findEx(id); if (!f) return vHome();
-  var ls = logsOf(id), td = today(), last = ls[ls.length-1];
-  var prev = ls.filter(function(l){return l.date!==td;}); prev = prev[prev.length-1];
+  var ls = logsOf(id), td = logDay(), last = ls[ls.length-1];
+  var prev = ls.filter(function(l){return l.date<td;}); prev = prev[prev.length-1];
   if (!draft[id]) draft[id] = { kg: last?last.kg:10, reps: last?last.reps:10, scarse:false };
   var dr = draft[id];
   var todays = ls.filter(function(l){return l.date===td;});
@@ -1253,13 +1268,14 @@ function vEx(id){
   var setsRow = '<div class="sets"><span class="label" style="color:var(--muted)">'+t("sets")+'</span><div class="sdots" aria-label="'+t("setsDoneAria", nDone, goal)+'">'+dots+'</div>'+
     '<div class="mini" role="group" aria-label="'+t("setsGoal")+'"><button data-act="sgoal" data-id="'+id+'" data-d="-1" aria-label="'+t("oneLess")+'">−</button><span>'+t("goal", goal)+'</span><button data-act="sgoal" data-id="'+id+'" data-d="1" aria-label="'+t("oneMore")+'">+</button></div></div>';
   var saveLbl = nDone<goal ? t("saveSet", nDone+1, goal) : t("extraSet");
-  var todayHtml = todays.length ? '<div class="panel"><div class="phead">'+t("todaysSets")+'</div>'+todays.map(function(l,i){
+  var todayHtml = todays.length ? '<div class="panel"><div class="phead">'+(LOGDATE ? esc(t("setsOf", dayLabel(td))) : t("todaysSets"))+'</div>'+todays.map(function(l,i){
     return '<div class="prow"><span class="mono muted" style="width:22px">'+(i+1)+'</span><span class="grow mono" style="font-weight:700">'+fmtNum(l.kg)+' kg × '+l.reps+' reps</span>'+
       (l.scarse?'<span class="tag scarse">'+t("barely")+'</span>':'')+'<button class="x" data-act="delLog" data-id="'+l.id+'" aria-label="'+t("delSet")+'">'+I.x+'</button></div>';
   }).join("")+'</div>' : "";
   var pains = recentPains(id), painNote = pains.length ? '<a class="painnote" href="#/adv/'+pains[0].id+'">'+I.zap+'<span class="grow">'+esc(t("painAt", t("areaIn")[pains[0].area], rel(pains[0].date)))+'</span><b>'+t("seeAdvice")+'</b></a>' : "";
-  return '<main><div class="row"><a class="iconbtn" data-back href="#/g/'+f.g.id+'" aria-label="'+t("back")+'">'+I.back+'</a>'+
+  return '<main><div class="row"><a class="iconbtn" data-back href="'+(parentOf("#/e/"+id)||"#/g/"+f.g.id)+'" aria-label="'+t("back")+'">'+I.back+'</a>'+
     '<div class="grow"><span class="label">'+esc(f.g.name)+' · '+t("nOfM", idx, f.g.exercises.length)+'</span><h1 class="title-l">'+esc(f.ex.name)+'</h1></div></div>'+
+    pastBanner()+'<label class="field"><span class="label" style="color:var(--muted)">'+t("dayL")+'</span><input id="ldate" type="date" max="'+today()+'" value="'+td+'"></label>'+
     painNote+tipsHtml(f, ls)+
     '<section class="logcard gtop" style="--gc:'+gColor(f.g)+'">'+setsRow+
       (prev?'<div class="row" style="font-size:14px;flex-wrap:wrap;gap:8px"><span class="muted">'+t("lastTimeC")+'</span><span class="mono" style="font-weight:700">'+fmtNum(prev.kg)+' kg × '+prev.reps+' reps</span>'+(prev.scarse?'<span class="tag scarse">'+t("barely")+'</span>':'')+'</div>':'')+
@@ -1271,7 +1287,7 @@ function vEx(id){
         '<button data-act="reps" data-d="1" aria-label="'+t("repMore")+'">'+I.plus+'</button></div></div>'+
       '<div class="seg"><button data-act="clean" aria-pressed="'+!dr.scarse+'">'+t("clean")+'</button><button class="sc" data-act="scarse" aria-pressed="'+dr.scarse+'">'+(dr.scarse?I.checkInk:"")+t("barelyB")+'</button></div>'+
       '<button class="btn btn-accent" data-act="saveLog" data-id="'+id+'"><span>'+saveLbl+' · '+fmtNum(dr.kg)+' kg × '+dr.reps+' reps</span></button>'+
-    '</section>'+timerHtml()+todayHtml+
+    '</section>'+(LOGDATE ? "" : timerHtml())+todayHtml+
     '<a class="btn btn-plain btn-nurse" href="#/pain/'+id+'">'+bell("nurse",44)+t("painQ")+'</a>'+
     '<div class="links"><button class="btn btn-plain" data-act="renEx" data-id="'+id+'">'+t("rename")+'</button><button class="btn btn-plain" data-act="delEx" data-id="'+id+'">'+t("delEx")+'</button></div>'+
     '</main>';
@@ -1541,6 +1557,7 @@ function dayIndex(){
   return by;
 }
 function vCal(){
+  LOGDATE = null;
   if (!CALM) CALM = today().slice(0,7);
   var by = dayIndex(), td = today();
   var first = new Date(CALM+"-01T00:00:00"), lead = (first.getDay()+6)%7, n = new Date(first.getFullYear(), first.getMonth()+1, 0).getDate();
@@ -1588,7 +1605,17 @@ function vDay(ds){
   }).join("");
   return '<main>'+topBack("#/c")+'<div><span class="label">'+esc(dayLabel(ds))+'</span><h1 class="title-l">'+esc(longDay(ds))+'</h1></div>'+
     '<span class="mono muted" style="font-size:12.5px">'+tn(dayLogs.length,"set1","setN")+'</span>'+
-    pains+(blocks || '<div class="empty">'+bellSay("sleep",64,"")+t("dayEmpty")+'</div>')+'</main>'+navBar("cal");
+    pains+(blocks || '<div class="empty">'+bellSay("sleep",64,"")+t("dayEmpty")+'</div>')+
+    (ds<=today() ? '<button class="btn btn-accent" data-act="addToDay" data-v="'+ds+'">'+I.plus+t("addToDay")+'</button>' : '')+'</main>'+navBar("cal");
+}
+function vDayAdd(ds){
+  var groups = S.groups.filter(function(g){ return g.exercises.length; }).map(function(g){
+    return '<div class="panel"><div class="phead" style="display:flex;align-items:center;gap:8px"><i class="dot" style="background:'+gColor(g)+'"></i>'+esc(g.name)+'</div>'+
+      g.exercises.map(function(ex){ var n = S.logs.filter(function(l){ return l.exId===ex.id && l.date===ds; }).length;
+        return '<a class="prow" href="#/e/'+ex.id+'"><b class="grow">'+esc(ex.name)+'</b>'+(n?'<span class="tag up">'+tn(n,"set1","setN")+'</span>':'')+I.next+'</a>'; }).join("")+'</div>';
+  }).join("");
+  return '<main>'+topBack("#/d/"+ds)+pastBanner()+'<div><span class="label">'+esc(longDay(ds))+'</span><h1 class="title-l">'+t("chooseEx")+'</h1></div>'+
+    (groups || '<div class="empty">'+t("noGroups")+'</div>')+'</main>';
 }
 
 /* ---------- dolori: segnalazione e consigli ---------- */
@@ -1653,7 +1680,7 @@ function route(){
   else if (h[0]==="n") html = vNote();
   else if (h[0]==="s") html = vSettings();
   else if (h[0]==="c") html = vCal();
-  else if (h[0]==="d") html = vDay(h[1]);
+  else if (h[0]==="d") html = h[2]==="add" ? vDayAdd(h[1]) : vDay(h[1]);
   else if (h[0]==="pain") html = vPain(h[1]);
   else if (h[0]==="adv") html = vAdv(h[1]);
   else if (h[0]==="x") html = vPick(h[1], h[2]);
@@ -1676,10 +1703,10 @@ function goBack(target){
 }
 function parentOf(h){
   var p = h.replace(/^#\/?/,"").split("/");
-  if (p[0]==="e"){ var f = findEx(p[1]); return f ? "#/g/"+f.g.id : "#/"; }
+  if (p[0]==="e"){ var pe = STACK[STACK.length-2]; if (pe && /^#\/d\/.+\/add$/.test(pe)) return pe; var f = findEx(p[1]); return f ? "#/g/"+f.g.id : "#/"; }
   if (p[0]==="p" && p[1]==="e"){ var f2 = findEx(p[2]); return f2 ? "#/p/g/"+f2.g.id : "#/p"; }
   if (p[0]==="p" && p[1]==="g") return "#/p";
-  if (p[0]==="d") return "#/c";
+  if (p[0]==="d") return p[2] ? "#/d/"+p[1] : "#/c";
   if (p[0]==="x") return p[2] ? "#/e/"+p[2] : "#/g/"+p[1];
   if (p[0]==="pain") return p[1] && findEx(p[1]) ? "#/e/"+p[1] : "#/";
   /* i consigli si aprono da più posti (esercizio, segnalazioni, calendario): si torna da dove si è venuti */
@@ -1748,15 +1775,18 @@ app.addEventListener("click", function(e){
   else if (act==="kg" || act==="reps"){ d = readDraft(); var step = parseFloat(b.getAttribute("data-d"));
     if (act==="kg") d.kg = Math.max(0, Math.round((d.kg+step)*100)/100); else d.reps = Math.max(0, d.reps+step);
     rerender(true); }
+  else if (act==="backToday"){ LOGDATE = null; rerender(true); }
+  else if (act==="addToDay"){ var dd = b.getAttribute("data-v"); LOGDATE = dd===today() ? null : dd; go("#/d/"+dd+"/add"); }
   else if (act==="gcolor"){ findGroup(id).c = b.getAttribute("data-v"); save(); rerender(true); }
   else if (act==="sgoal"){ var fx = findEx(id); readDraft(); fx.ex.sets = Math.max(1, Math.min(10, setsGoal(fx.ex)+parseInt(b.getAttribute("data-d"),10))); save(); rerender(true); }
   else if (act==="clean" || act==="scarse"){ d = readDraft(); d.scarse = act==="scarse"; rerender(true); }
   else if (act==="saveLog"){ d = readDraft();
     if (!d.reps){ toast(t("addRep")); return; }
-    S.logs.push({id:uid(), exId:id, date:today(), kg:d.kg, reps:d.reps, scarse:d.scarse, t:Date.now()}); d.scarse=false; save();
-    var fs = findEx(id), nd = S.logs.filter(function(l){return l.exId===id && l.date===today();}).length, gl = setsGoal(fs.ex);
-    /* dopo l'ultima serie (e le extra) non serve recuperare */
-    var rest = T.auto && nd<gl;
+    var ld = logDay();
+    S.logs.push({id:uid(), exId:id, date:ld, kg:d.kg, reps:d.reps, scarse:d.scarse, t:Date.now()}); d.scarse=false; save();
+    var fs = findEx(id), nd = S.logs.filter(function(l){return l.exId===id && l.date===ld;}).length, gl = setsGoal(fs.ex);
+    /* dopo l'ultima serie (e le extra) non serve recuperare; nei giorni passati il recupero non ha senso */
+    var rest = T.auto && nd<gl && !LOGDATE;
     if (rest) timerStart(T.dur); rerender(true);
     toast(nd===gl ? t("allSetsDone", gl) : t("setSaved", nd, gl)+(rest?t("restStarted"):"")); }
   else if (act==="tset"){ T.dur = +b.getAttribute("data-v"); tSave(); timerStart(T.dur); rerender(true); }
@@ -1794,6 +1824,7 @@ app.addEventListener("input", function(e){
 app.addEventListener("change", function(e){
   if (e.target.id==="kg" || e.target.id==="reps"){ readDraft(); rerender(true); }
   if (e.target.id==="painex") PF.exId = e.target.value;
+  if (e.target.id==="ldate"){ var v = e.target.value; LOGDATE = (!v || v>=today()) ? null : v; rerender(true); }
   if (e.target.id==="pred") PF.red = e.target.checked;
   if (e.target.id==="file" && e.target.files[0]){
     var r = new FileReader();
