@@ -372,7 +372,7 @@ en: {
   autoCopies:"Automatic copies", copyDaily:"Start of the day", copyBefore:"Before a change", restoreCopy:"Restore",
   confRestoreCopy:"Restore the copy of {0}? Your current data is saved as a copy first.", lastOut:"Last backup saved outside the phone: {0}", lastOutNever:"You haven't saved a backup outside the phone yet.",
   bkTitle:"Save a backup", bkDue:"Your last backup outside the phone was {0}. Save one now: it has all your history.", bkFirst:"Save a full backup outside the phone (iCloud, Drive, email): it has all your history.",
-  bkNow:"Save now", bkLater:"Later", bkSaved:"Backup ready", nSets:"{0} sets", restoreB:"Restore backup", resetB:"Delete everything",
+  bkNow:"Save now", bkLater:"Later", bkSaved:"Backup ready", bkDownloaded:"Backup downloaded", nSets:"{0} sets", restoreB:"Restore backup", resetB:"Delete everything",
   theme:"Theme", light:"Light", dark:"Dark", language:"Language",
   addRep:"Add at least one rep", allSetsDone:"All {0} sets done!", setSaved:"Set {0}/{1} saved", restStarted:" · rest started", confDelSet:"Delete this set?",
   promptGroup:"Group name (e.g. Back)", newName:"New name", confDelGroup:"Delete “{0}” and all its history?", promptEx:"Exercise name",
@@ -437,7 +437,7 @@ it: {
   autoCopies:"Copie automatiche", copyDaily:"Inizio giornata", copyBefore:"Prima di una modifica", restoreCopy:"Ripristina",
   confRestoreCopy:"Ripristinare la copia del {0}? Prima i dati attuali vengono salvati come copia.", lastOut:"Ultimo backup salvato fuori dal telefono: {0}", lastOutNever:"Non hai ancora salvato un backup fuori dal telefono.",
   bkTitle:"Salva un backup", bkDue:"L'ultimo backup fuori dal telefono è di {0}. Salvane uno ora: contiene tutto lo storico.", bkFirst:"Salva un backup completo fuori dal telefono (iCloud, Drive, email): contiene tutto lo storico.",
-  bkNow:"Salva ora", bkLater:"Più tardi", bkSaved:"Backup pronto", nSets:"{0} serie", restoreB:"Ripristina backup", resetB:"Elimina tutto",
+  bkNow:"Salva ora", bkLater:"Più tardi", bkSaved:"Backup pronto", bkDownloaded:"Backup scaricato", nSets:"{0} serie", restoreB:"Ripristina backup", resetB:"Elimina tutto",
   theme:"Tema", light:"Chiaro", dark:"Scuro", language:"Lingua",
   addRep:"Aggiungi almeno una ripetizione", allSetsDone:"Tutte le {0} serie fatte!", setSaved:"Serie {0}/{1} salvata", restStarted:" · recupero partito", confDelSet:"Eliminare questa serie?",
   promptGroup:"Nome del gruppo (es. Schiena)", newName:"Nuovo nome", confDelGroup:"Eliminare “{0}” e tutto il suo storico?", promptEx:"Nome dell'esercizio",
@@ -904,14 +904,26 @@ function snapshot(kind){
 function lastExport(){ try { return localStorage.getItem("ghisa-lastexport"); } catch(e){ return null; } }
 function markExported(){ try { localStorage.setItem("ghisa-lastexport", today()); localStorage.removeItem("ghisa-bksnooze"); } catch(e){} }
 function exportBackup(){
-  var json = JSON.stringify(S, null, 1), name = "ghisa-backup-"+today()+".json", file = null;
-  try { file = new File([json], name, {type:"application/json"}); } catch(e){}
-  if (file && navigator.canShare && navigator.canShare({files:[file]})){
-    navigator.share({files:[file], title:name}).then(function(){ markExported(); toast(t("bkSaved")); rerender(true); }).catch(function(){});
+  var json = JSON.stringify(S, null, 1), name = "ghisa-backup-"+today()+".json";
+  /* Android accetta in condivisione solo alcuni tipi: se il JSON non passa si riprova come testo, il nome resta .json.
+     Niente title: su iPhone viene condiviso come elemento a parte e può far sparire "Salva su File". */
+  var file = shareable(json, name, "application/json") || shareable(json, name, "text/plain");
+  if (file){
+    navigator.share({files:[file]}).then(function(){ markExported(); toast(t("bkSaved")); rerender(true); })
+      .catch(function(err){ if (!err || err.name!=="AbortError") downloadBackup(json, name); });
     return;
   }
-  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([json],{type:"application/json"})); a.download = name;
-  document.body.appendChild(a); a.click(); a.remove(); markExported(); rerender(true);
+  downloadBackup(json, name);
+}
+function shareable(json, name, type){
+  try { var f = new File([json], name, {type:type}); return navigator.canShare && navigator.canShare({files:[f]}) ? f : null; } catch(e){ return null; }
+}
+function downloadBackup(json, name){
+  var url = URL.createObjectURL(new Blob([json],{type:"application/json"}));
+  var a = document.createElement("a"); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  markExported(); toast(t("bkDownloaded")); rerender(true);
 }
 /* promemoria in home: ogni 7 giorni, rimandabile di 2 */
 function backupDue(){
